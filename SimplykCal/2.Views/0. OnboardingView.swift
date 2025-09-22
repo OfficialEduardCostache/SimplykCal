@@ -627,7 +627,7 @@ private struct GoalScreen: View {
                         Chart {
                             ForEach(data) { p in
                                 LineMark(
-                                    x: .value("Weekweekekekesdfsdfsdf", p.week),
+                                    x: .value("Week", p.week),
                                     y: .value("Value", p.y)
                                 )
                                 .interpolationMethod(.linear)
