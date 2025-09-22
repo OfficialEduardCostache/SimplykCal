@@ -1,0 +1,29 @@
+# Xcode user data & build products
+DerivedData/
+build/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcuserstate
+
+# Swift Package Manager
+.swiftpm/
+.build/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+
+# Misc
+.DS_Store
+*.swp
+*.orig
+
+# Playground timelines
+timeline.xctimeline
+playground.xcworkspace
+
+# Crash & logs
+*.ipa
+*.dSYM.zip
+*.crash
