@@ -10,7 +10,7 @@ import SwiftData
 
 struct RootView: View {
     @State var tabBarViewModel: TabBarViewModel = TabBarViewModel()
-    @State var isOnboardingComplete: Bool = true
+    @State var isOnboardingComplete: Bool = false
     
     var body: some View {
         

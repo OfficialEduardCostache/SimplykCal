@@ -9,52 +9,45 @@ import SwiftUI
 import Charts
 
 struct OnboardingView: View {
-    @State var screenStep: Int = 0
-    
-    @State var nameText: String = ""
-    @State private var fadeOpacity: Double = 0
+    @State var viewModel: OnboardingViewModel = OnboardingViewModel()
     
     @Binding var isOnboardingComplete: Bool
-    
-    @State var triggerHaptics: Bool = false
 
-    private let totalSteps: Int = 6
-    private let fadeDuration: Double = 0.4
 
     // Intercepts child screen writes to `screenStep` to perform fade-out → change → fade-in
-    private var animatedScreenStep: Binding<Int> {
-        Binding(
-            get: { screenStep },
-            set: { newValue in
-                guard newValue != screenStep else { return }
-                withAnimation(.easeInOut(duration: fadeDuration)) { fadeOpacity = 1 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + fadeDuration) {
-                    screenStep = newValue
-                    withAnimation(.easeInOut(duration: fadeDuration)) { fadeOpacity = 0 }
-                }
-            }
-        )
-    }
+//    private var animatedScreenStep: Binding<Int> {
+//        Binding(
+//            get: { screenStep },
+//            set: { newValue in
+//                guard newValue != screenStep else { return }
+//                withAnimation(.easeInOut(duration: fadeDuration)) { fadeOpacity = 1 }
+//                DispatchQueue.main.asyncAfter(deadline: .now() + fadeDuration) {
+//                    screenStep = newValue
+//                    withAnimation(.easeInOut(duration: fadeDuration)) { fadeOpacity = 0 }
+//                }
+//            }
+//        )
+//    }
 
     var body: some View {
         ZStack{
-            if screenStep == 0 {
-                IntroScreen(screenStep: animatedScreenStep, triggerHaptics: $triggerHaptics)
-            } else if screenStep == 1 {
-                NameScreen(screenStep: animatedScreenStep, nameText: $nameText, triggerHaptics: $triggerHaptics)
-            } else if screenStep == 2 {
-                DetailsScreen(screenStep: animatedScreenStep, triggerHaptics: $triggerHaptics)
-            } else if screenStep == 3 {
-                GoalScreen(screenStep: animatedScreenStep, triggerHaptics: $triggerHaptics)
-            } else if screenStep == 4 {
-                DieteryPreferancesScreen(screenStep: animatedScreenStep, triggerHaptics: $triggerHaptics)
-            } else if screenStep == 5 {
-                SetupScreen(screenStep: animatedScreenStep, isOnboardingComplete: $isOnboardingComplete, triggerHaptics: $triggerHaptics)
+            if viewModel.screenStep == 0 {
+                IntroScreen(viewModel: $viewModel)
+            } else if viewModel.screenStep == 1 {
+                NameScreen(viewModel: $viewModel)
+            } else if viewModel.screenStep == 2 {
+                DetailsScreen(viewModel: $viewModel)
+            } else if viewModel.screenStep == 3 {
+                GoalScreen(viewModel: $viewModel)
+            } else if viewModel.screenStep == 4 {
+                DieteryPreferancesScreen(viewModel: $viewModel)
+            } else if viewModel.screenStep == 5 {
+                SetupScreen(viewModel: $viewModel, isOnboardingComplete: $isOnboardingComplete)
             }
 
             Rectangle()
                 .fill(Color("background"))
-                .opacity(fadeOpacity)
+                .opacity(viewModel.fadeOpacity)
                 .ignoresSafeArea(.all)
         }
         .background(Color("background").ignoresSafeArea())
@@ -62,25 +55,25 @@ struct OnboardingView: View {
             HStack{
                 // Back button
                 Button {
-                    triggerHaptics.toggle()
-                    screenStep -= 1
+                    viewModel.triggerHaptics.toggle()
+                    viewModel.back()
                 } label: {
-                    BackButtonLabel(isHidden: screenStep == 0 ? true : false)
+                    BackButtonLabel(isHidden: viewModel.screenStep == 0 ? true : false)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading, 20)
-                .disabled(screenStep == 0 ? true : false)
+                .disabled(viewModel.screenStep == 0 ? true : false)
                 
-                ForEach(0..<totalSteps, id: \.self) { step in
+                ForEach(0..<viewModel.totalSteps, id: \.self) { step in
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(step == screenStep ? Color("primary") : Color("primary").opacity(0.1))
+                        .fill(step == viewModel.screenStep ? Color("primary") : Color("primary").opacity(0.1))
                         .frame(width: 24, height: 6)
                 }
                 
                 // Skip button / not in use at the moment
                 Button {
-                    triggerHaptics.toggle()
-                    screenStep += 1
+                    viewModel.triggerHaptics.toggle()
+                    viewModel.next()
                 } label: {
                     Text("Skip")
                         .font(.system(size: 16, weight: .regular, design: .monospaced))
@@ -93,17 +86,16 @@ struct OnboardingView: View {
             }
             .overlay{
                 Color("background")
-                    .opacity(fadeOpacity)
+                    .opacity(viewModel.fadeOpacity)
             }
             .padding(.top, 20)
-            .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.5), trigger: triggerHaptics)
+            .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.5), trigger: viewModel.triggerHaptics)
         }
     }
 }
 
 private struct IntroScreen: View {
-    @Binding var screenStep: Int
-    @Binding var triggerHaptics: Bool
+    @Binding var viewModel: OnboardingViewModel
     
     var body: some View {
         VStack {
@@ -133,8 +125,8 @@ private struct IntroScreen: View {
         .padding()
         .safeAreaInset(edge: .bottom) {
             SKActionButton(title: "Next", fillColour: Color("primary"), action: {
-                triggerHaptics.toggle()
-                screenStep += 1
+                viewModel.triggerHaptics.toggle()
+                viewModel.next()
             })
             .padding()
             .padding(.bottom, 40)
@@ -143,9 +135,7 @@ private struct IntroScreen: View {
 }
 
 private struct NameScreen: View {
-    @Binding var screenStep: Int
-    @Binding var nameText: String
-    @Binding var triggerHaptics: Bool
+    @Binding var viewModel: OnboardingViewModel
 
     var body: some View {
         VStack {
@@ -167,7 +157,7 @@ private struct NameScreen: View {
             }
             .padding()
             
-            SKTextField(text: $nameText)
+            SKTextField(text: $viewModel.name)
                 .padding(.horizontal)
             
             Spacer()
@@ -176,8 +166,8 @@ private struct NameScreen: View {
         }
         .safeAreaInset(edge: .bottom) {
             SKActionButton(title: "Next", fillColour: Color("primary"), action: {
-                triggerHaptics.toggle()
-                screenStep += 1
+                viewModel.triggerHaptics.toggle()
+                viewModel.next()
             })
             .padding()
             .padding(.bottom, 40)
@@ -187,20 +177,8 @@ private struct NameScreen: View {
 
 //MARK: DETAILS SCREEN
 private struct DetailsScreen: View {
-    @State private var selectedGender: String? = nil
-    @Binding var screenStep: Int
-    @Binding var triggerHaptics: Bool
-    
-    @State var age: Double = 25
-    let ageRange: ClosedRange<Double> = 16...80
-    
-    @State var height: Double = 177
-    let heightRange: ClosedRange<Double> = 120...250
-    
-    @State var weight: Double = 70
-    let weightRange: ClosedRange<Double> = 35...105
-    
-    
+    @Binding var viewModel: OnboardingViewModel
+
     var body: some View {
         VStack{
             VStack{
@@ -232,7 +210,7 @@ private struct DetailsScreen: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 //.background(Color.blue)
                             
-                            Text(String(format: "%.0f", age))
+                            Text(String(format: "%.0f", viewModel.age))
                                 .font(.system(size: 18, weight: .regular, design: .monospaced))
                                 .foregroundStyle(Color("text2"))
                                 .frame(maxWidth: .infinity, alignment: .center)
@@ -241,9 +219,7 @@ private struct DetailsScreen: View {
                         
                         HStack {
                             Button {
-                                if age > ageRange.lowerBound{
-                                    age -= 1
-                                }
+                                viewModel.decrementAge()
                             } label: {
                                 Image(systemName: "minus")
                                     .resizable()
@@ -257,15 +233,13 @@ private struct DetailsScreen: View {
                                     )
                             }
 
-                            Slider(value: $age, in: ageRange, step: 1.0)
+                            Slider(value: $viewModel.age, in: viewModel.ageRange, step: 1.0)
                                 .tint(Color("primary"))
                                 .padding(.horizontal, 6)
                             
                             
                             Button {
-                                if age < ageRange.upperBound{
-                                    age += 1
-                                }
+                                viewModel.incrementAge()
                             } label: {
                                 Image(systemName: "plus")
                                     .resizable()
@@ -290,7 +264,7 @@ private struct DetailsScreen: View {
                                 .foregroundStyle(Color("text1"))
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             
-                            Text(String(format: "%.0fcm", height))
+                            Text(String(format: "%.0fcm", viewModel.height))
                                 .font(.system(size: 18, weight: .regular, design: .monospaced))
                                 .foregroundStyle(Color("text2"))
                                 .frame(maxWidth: .infinity, alignment: .center)
@@ -298,9 +272,7 @@ private struct DetailsScreen: View {
                         
                         HStack {
                             Button {
-                                if height > heightRange.lowerBound{
-                                    height -= 1
-                                }
+                                viewModel.decrementHeight()
                             } label: {
                                 Image(systemName: "minus")
                                     .resizable()
@@ -314,15 +286,13 @@ private struct DetailsScreen: View {
                                     )
                             }
 
-                            Slider(value: $height, in: heightRange, step: 1)
+                            Slider(value: $viewModel.height, in: viewModel.heightRange, step: 1)
                                 .tint(Color("primary"))
                                 .padding(.horizontal, 6)
                             
                             
                             Button {
-                                if height < heightRange.upperBound{
-                                    height += 1
-                                }
+                                viewModel.incrementHeight()
                             } label: {
                                 Image(systemName: "plus")
                                     .resizable()
@@ -348,7 +318,7 @@ private struct DetailsScreen: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 //.background(Color.blue)
                             
-                            Text(String(format: "%.0fkg", weight))
+                            Text(String(format: "%.0fkg", viewModel.weight))
                                 .font(.system(size: 18, weight: .regular, design: .monospaced))
                                 .foregroundStyle(Color("text2"))
                                 .frame(maxWidth: .infinity, alignment: .center)
@@ -357,9 +327,7 @@ private struct DetailsScreen: View {
                         
                         HStack {
                             Button {
-                                if weight > weightRange.lowerBound{
-                                    weight -= 1
-                                }
+                                viewModel.decrementWeight()
                             } label: {
                                 Image(systemName: "minus")
                                     .resizable()
@@ -373,15 +341,13 @@ private struct DetailsScreen: View {
                                     )
                             }
 
-                            Slider(value: $weight, in: weightRange, step: 1.0)
+                            Slider(value: $viewModel.weight, in: viewModel.weightRange, step: 1.0)
                                 .tint(Color("primary"))
                                 .padding(.horizontal, 6)
                             
                             
                             Button {
-                                if weight < weightRange.upperBound{
-                                    weight += 1
-                                }
+                                viewModel.incrementWeight()
                             } label: {
                                 Image(systemName: "plus")
                                     .resizable()
@@ -407,13 +373,13 @@ private struct DetailsScreen: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
                         HStack{
-                            GenderButton(title: "Male", isSelected: selectedGender == "Male") {
-                                selectedGender = "Male"
+                            GenderButton(title: "Male", isSelected: viewModel.gender == .male) {
+                                viewModel.gender = .male
                             }
-                            GenderButton(title: "Female", isSelected: selectedGender == "Female") {
-                                selectedGender = "Female"
+                            GenderButton(title: "Female", isSelected: viewModel.gender == .female) {
+                                viewModel.gender = .female
                             }
-                            .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.3), trigger: selectedGender)
+                            .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.3), trigger: viewModel.triggerHaptics)
                         }
                     }
                     .padding(.horizontal)
@@ -421,16 +387,16 @@ private struct DetailsScreen: View {
                 }
                 
             }
-            .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.3), trigger: age)
-            .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.3), trigger: height)
-            .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.3), trigger: weight)
+            .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.3), trigger: viewModel.age)
+            .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.3), trigger: viewModel.height)
+            .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.3), trigger: viewModel.weight)
             
             Spacer()
         }
         .safeAreaInset(edge: .bottom) {
             SKActionButton(title: "Next", fillColour: Color("primary"), action: {
-                triggerHaptics.toggle()
-                screenStep += 1
+                viewModel.triggerHaptics.toggle()
+                viewModel.screenStep += 1
             })
             .padding()
             .padding(.bottom, 40)
@@ -440,25 +406,7 @@ private struct DetailsScreen: View {
 
 //MARK: GoalScreen
 private struct GoalScreen: View {
-    @Binding var screenStep: Int
-    @Binding var triggerHaptics: Bool
-    
-    // 0 - Lose weight
-    // 1 - Maintain weight
-    // 2 - Gain weight
-    @State var selectedGoal: Int? = nil
-    
-    @State var paceForWeightLoss: Double = 50
-    @State var paceForWeightGain: Double = 50
-    
-    private let data: [TrendPoint] = [
-        TrendPoint(week: "W1", y: 70),
-        TrendPoint(week: "W2", y: 67),
-        TrendPoint(week: "W3", y: 65),
-        TrendPoint(week: "W4", y: 63),
-        TrendPoint(week: "W5", y: 61),
-        TrendPoint(week: "W6", y: 60)
-    ]
+    @Binding var viewModel: OnboardingViewModel
     
     var body: some View {
         VStack(spacing: 0) {
@@ -486,197 +434,197 @@ private struct GoalScreen: View {
             
 
             HStack{
-                SKActionButton(title: "Lose weight", fillColour: Color.green, textSize: 14, isSelected: selectedGoal == 0) {
-                    selectedGoal = 0
+                SKActionButton(title: "Lose weight", fillColour: Color.green, textSize: 14, isSelected: viewModel.goal == .lose) {
+                    viewModel.goal = .lose
+                    viewModel.generateGraphPointsForLoss()
                 }
                 
-                SKActionButton(title: "Maintain weight", fillColour: Color.orange, textSize: 14, isSelected: selectedGoal == 1) {
-                    selectedGoal = 1
+                SKActionButton(title: "Maintain weight", fillColour: Color.orange, textSize: 14, isSelected: viewModel.goal == .maintain) {
+                    viewModel.goal = .maintain
                 }
                 
-                SKActionButton(title: "Gain weight", fillColour: Color.red, textSize: 14, isSelected: selectedGoal == 2) {
-                    selectedGoal = 2
+                SKActionButton(title: "Gain weight", fillColour: Color.red, textSize: 14, isSelected: viewModel.goal == .gain) {
+                    viewModel.goal = .gain
+                    viewModel.generateGraphPointsForGain()
                 }
             }
             .padding(.horizontal)
-            .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.3), trigger: selectedGoal)
+            .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.3), trigger: viewModel.goal)
             
-            if let selectedGoal = selectedGoal{
-                // if the goal is to lose weight
-                if selectedGoal == 0 {
+            // if the goal is to lose weight
+            if viewModel.goal == .lose {
+                VStack{
+                    HStack{
+                        Text("Slower")
+                            .font(.system(size: 14, weight: .regular, design: .monospaced))
+                            .foregroundStyle(Color("text1"))
+                        
+                        Slider(value: $viewModel.paceForWeightLoss, in: 10...100, step: 10)
+                            .tint(Color("primary"))
+                            .padding(.horizontal)
+                            .padding(.top, 6)
+                        
+                        Text("Faster")
+                            .font(.system(size: 14, weight: .regular, design: .monospaced))
+                            .foregroundStyle(Color("text1"))
+                    }
+                    .padding(.horizontal)
+                    
                     VStack{
-                        HStack{
-                            Text("Slower")
-                                .font(.system(size: 14, weight: .regular, design: .monospaced))
-                                .foregroundStyle(Color("text1"))
-                            
-                            Slider(value: $paceForWeightLoss, in: 10...100, step: 10)
-                                .tint(Color("primary"))
-                                .padding(.horizontal)
-                                .padding(.top, 6)
-                            
-                            Text("Faster")
-                                .font(.system(size: 14, weight: .regular, design: .monospaced))
-                                .foregroundStyle(Color("text1"))
-                        }
-                        .padding(.horizontal)
+                        Text(String(format: "%.2f%%", viewModel.paceForWeightLoss / 100.0))
+                            .font(.system(size: 16, weight: .regular, design: .monospaced))
+                            .foregroundStyle(Color("text1"))
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.top, 6)
                         
-                        VStack{
-                            Text(String(format: "%.2f%%", paceForWeightLoss / 100.0))
-                                .font(.system(size: 16, weight: .regular, design: .monospaced))
-                                .foregroundStyle(Color("text1"))
-                                .frame(maxWidth: .infinity, alignment: .center)
-                                .padding(.top, 6)
-                            
-                            Text("of your body weight per week")
-                                .font(.system(size: 14, weight: .regular, design: .monospaced))
-                                .foregroundStyle(Color("text2"))
-                                .frame(maxWidth: .infinity, alignment: .center)
-                        }
-                        .sensoryFeedback(.impact(flexibility: .solid, intensity: 1), trigger: paceForWeightLoss)
-                        // LINE GRAPH
-                        Chart {
-                            ForEach(data) { p in
-                                LineMark(
-                                    x: .value("Week", p.week),
-                                    y: .value("Value", p.y)
-                                )
-                                .interpolationMethod(.linear)
-                                .lineStyle(.init(lineWidth: 2, lineCap: .round))
-                                .foregroundStyle(Color("primary"))
+                        Text("of your body weight per week")
+                            .font(.system(size: 14, weight: .regular, design: .monospaced))
+                            .foregroundStyle(Color("text2"))
+                            .frame(maxWidth: .infinity, alignment: .center)
+                    }
+                    .sensoryFeedback(.impact(flexibility: .solid, intensity: 1), trigger: viewModel.paceForWeightLoss)
+                    // LINE GRAPH
+                    Chart {
+                        ForEach(viewModel.graphData) { p in
+                            LineMark(
+                                x: .value("Week", p.week),
+                                y: .value("Value", p.y)
+                            )
+                            .interpolationMethod(.linear)
+                            .lineStyle(.init(lineWidth: 2, lineCap: .round))
+                            .foregroundStyle(Color("primary"))
 
-                                PointMark(
-                                    x: .value("Week", p.week),
-                                    y: .value("Value", p.y)
-                                )
-                                .symbol(.circle)
-                                .symbolSize(40)
-                                .foregroundStyle(Color("primary"))
-                            }
+                            PointMark(
+                                x: .value("Week", p.week),
+                                y: .value("Value", p.y)
+                            )
+                            .symbol(.circle)
+                            .symbolSize(40)
+                            .foregroundStyle(Color("primary"))
                         }
-                        .chartXAxis {
-                            AxisMarks(values: .automatic) { _ in
-                                AxisGridLine().foregroundStyle(Color("secondary").opacity(0.15))  // grid color
-                                AxisTick().foregroundStyle(Color("secondary").opacity(0.6))        // tick color
-                                AxisValueLabel()                                                   // label color + font
-                                    .foregroundStyle(Color("text1"))
-                                    .font(.system(size: 14, weight: .regular, design: .monospaced))
-                            }
+                    }
+                    .chartXAxis {
+                        AxisMarks(values: .automatic) { _ in
+                            AxisGridLine().foregroundStyle(Color("secondary").opacity(0.15))  // grid color
+                            AxisTick().foregroundStyle(Color("secondary").opacity(0.6))        // tick color
+                            AxisValueLabel()                                                   // label color + font
+                                .foregroundStyle(Color("text1"))
+                                .font(.system(size: 14, weight: .regular, design: .monospaced))
                         }
-                        .chartYAxis {
-                            AxisMarks(position: .leading) { _ in
-                                AxisGridLine().foregroundStyle(Color("secondary").opacity(0.15))
-                                AxisTick().foregroundStyle(Color("secondary").opacity(0.6))
-                                AxisValueLabel()
-                                    .foregroundStyle(Color("text1"))
-                                    .font(.system(size: 14, weight: .regular, design: .monospaced))
-                            }
+                    }
+                    .chartYAxis {
+                        AxisMarks(position: .leading) { _ in
+                            AxisGridLine().foregroundStyle(Color("secondary").opacity(0.15))
+                            AxisTick().foregroundStyle(Color("secondary").opacity(0.6))
+                            AxisValueLabel()
+                                .foregroundStyle(Color("text1"))
+                                .font(.system(size: 14, weight: .regular, design: .monospaced))
                         }
-                        .chartYScale(domain: .automatic(includesZero: false))
-                        .padding()
+                    }
+                    .chartYScale(domain: .automatic(includesZero: false))
+                    .padding()
+                    
+                    HStack{
+                        Image(systemName: "info.circle")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 14, height: 14)
+                            .foregroundStyle(Color("text2"))
                         
-                        HStack{
-                            Image(systemName: "info.circle")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 14, height: 14)
-                                .foregroundStyle(Color("text2"))
-                            
-                            Text("This is what you could lose by following our program for 6 weeks")
-                                .font(.system(size: 14, weight: .light, design: .monospaced))
-                                .foregroundStyle(Color("text2"))
-                        }
+                        Text("This is what you could lose by following our program for 6 weeks")
+                            .font(.system(size: 14, weight: .light, design: .monospaced))
+                            .foregroundStyle(Color("text2"))
                     }
                 }
-                // if the goal is to gain weight
-                else if selectedGoal == 2{
-                    VStack{
-                        HStack{
-                            Text("Slower")
-                                .font(.system(size: 14, weight: .regular, design: .monospaced))
-                                .foregroundStyle(Color("text1"))
-                            
-                            Slider(value: $paceForWeightGain, in: 10...100, step: 10)
-                                .tint(Color("primary"))
-                                .padding(.top, 6)
-                                .padding(.horizontal)
-                            
-                            Text("Faster")
-                                .font(.system(size: 14, weight: .regular, design: .monospaced))
-                                .foregroundStyle(Color("text1"))
-                        }
-                        .padding(.horizontal)
+            }
+            // if the goal is to gain weight
+            else if viewModel.goal == .gain{
+                VStack{
+                    HStack{
+                        Text("Slower")
+                            .font(.system(size: 14, weight: .regular, design: .monospaced))
+                            .foregroundStyle(Color("text1"))
                         
-                        VStack{
-                            Text(String(format: "%.2f%%", paceForWeightGain / 100.0))
-                                .font(.system(size: 16, weight: .regular, design: .monospaced))
-                                .foregroundStyle(Color("text1"))
-                                .frame(maxWidth: .infinity, alignment: .center)
-                                .padding(.top, 6)
-
-                            
-                            Text("of your body weight per week")
-                                .font(.system(size: 14, weight: .regular, design: .monospaced))
-                                .foregroundStyle(Color("text2"))
-                                .frame(maxWidth: .infinity, alignment: .center)
-                        }
-                        .sensoryFeedback(.impact(flexibility: .solid, intensity: 1), trigger: paceForWeightGain)
+                        Slider(value: $viewModel.paceForWeightGain, in: 10...100, step: 10)
+                            .tint(Color("primary"))
+                            .padding(.top, 6)
+                            .padding(.horizontal)
                         
-
-                        
-                        Chart {
-                            ForEach(data) { p in
-                                LineMark(
-                                    x: .value("Week", p.week),
-                                    y: .value("Value", p.y)
-                                )
-                                .interpolationMethod(.linear)
-                                .lineStyle(.init(lineWidth: 2, lineCap: .round))
-                                .foregroundStyle(Color("primary"))
-
-                                PointMark(
-                                    x: .value("Week", p.week),
-                                    y: .value("Value", p.y)
-                                )
-                                .symbol(.circle)
-                                .symbolSize(40)
-                                .foregroundStyle(Color("primary"))
-                            }
-                        }
-                        .chartXAxis {
-                            AxisMarks(values: .automatic) { _ in
-                                AxisGridLine().foregroundStyle(Color("secondary").opacity(0.15))  // grid color
-                                AxisTick().foregroundStyle(Color("secondary").opacity(0.6))        // tick color
-                                AxisValueLabel()                                                   // label color + font
-                                    .foregroundStyle(Color("text1"))
-                                    .font(.system(size: 14, weight: .regular, design: .monospaced))
-                            }
-                        }
-                        .chartYAxis {
-                            AxisMarks(position: .leading) { _ in
-                                AxisGridLine().foregroundStyle(Color("secondary").opacity(0.15))
-                                AxisTick().foregroundStyle(Color("secondary").opacity(0.6))
-                                AxisValueLabel()
-                                    .foregroundStyle(Color("text1"))
-                                    .font(.system(size: 14, weight: .regular, design: .monospaced))
-                            }
-                        }
-                        .chartYScale(domain: .automatic(includesZero: false))
-                        .padding()
-                        
-                        HStack{
-                            Image(systemName: "info.circle")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 14, height: 14)
-                                .foregroundStyle(Color("text2"))
-                            
-                            Text("This is what you could gain by following our program for 6 weeks")
-                                .font(.system(size: 14, weight: .light, design: .monospaced))
-                                .foregroundStyle(Color("text2"))
-                        }
-
+                        Text("Faster")
+                            .font(.system(size: 14, weight: .regular, design: .monospaced))
+                            .foregroundStyle(Color("text1"))
                     }
+                    .padding(.horizontal)
+                    
+                    VStack{
+                        Text(String(format: "%.2f%%", viewModel.paceForWeightGain / 100.0))
+                            .font(.system(size: 16, weight: .regular, design: .monospaced))
+                            .foregroundStyle(Color("text1"))
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.top, 6)
+                        
+                        
+                        Text("of your body weight per week")
+                            .font(.system(size: 14, weight: .regular, design: .monospaced))
+                            .foregroundStyle(Color("text2"))
+                            .frame(maxWidth: .infinity, alignment: .center)
+                    }
+                    .sensoryFeedback(.impact(flexibility: .solid, intensity: 1), trigger: viewModel.paceForWeightGain)
+                    
+                    
+                    
+                    Chart {
+                        ForEach(viewModel.graphData) { p in
+                            LineMark(
+                                x: .value("Week", p.week),
+                                y: .value("Value", p.y)
+                            )
+                            .interpolationMethod(.linear)
+                            .lineStyle(.init(lineWidth: 2, lineCap: .round))
+                            .foregroundStyle(Color("primary"))
+                            
+                            PointMark(
+                                x: .value("Week", p.week),
+                                y: .value("Value", p.y)
+                            )
+                            .symbol(.circle)
+                            .symbolSize(40)
+                            .foregroundStyle(Color("primary"))
+                        }
+                    }
+                    .chartXAxis {
+                        AxisMarks(values: .automatic) { _ in
+                            AxisGridLine().foregroundStyle(Color("secondary").opacity(0.15))  // grid color
+                            AxisTick().foregroundStyle(Color("secondary").opacity(0.6))        // tick color
+                            AxisValueLabel()                                                   // label color + font
+                                .foregroundStyle(Color("text1"))
+                                .font(.system(size: 14, weight: .regular, design: .monospaced))
+                        }
+                    }
+                    .chartYAxis {
+                        AxisMarks(position: .leading) { _ in
+                            AxisGridLine().foregroundStyle(Color("secondary").opacity(0.15))
+                            AxisTick().foregroundStyle(Color("secondary").opacity(0.6))
+                            AxisValueLabel()
+                                .foregroundStyle(Color("text1"))
+                                .font(.system(size: 14, weight: .regular, design: .monospaced))
+                        }
+                    }
+                    .chartYScale(domain: .automatic(includesZero: false))
+                    .padding()
+                    
+                    HStack{
+                        Image(systemName: "info.circle")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 14, height: 14)
+                            .foregroundStyle(Color("text2"))
+                        
+                        Text("This is what you could gain by following our program for 6 weeks")
+                            .font(.system(size: 14, weight: .light, design: .monospaced))
+                            .foregroundStyle(Color("text2"))
+                    }
+                    
                 }
             }
             
@@ -684,8 +632,8 @@ private struct GoalScreen: View {
         }
         .safeAreaInset(edge: .bottom) {
             SKActionButton(title: "Next", fillColour: Color("primary"), action: {
-                triggerHaptics.toggle()
-                screenStep += 1
+                viewModel.triggerHaptics.toggle()
+                viewModel.next()
             })
             .padding()
             .padding(.bottom, 40)
@@ -693,37 +641,21 @@ private struct GoalScreen: View {
     }
 }
 
-enum Restriction: String, CaseIterable, Hashable {
-    case vegetarian = "Vegetarian"
-    case vegan = "Vegan"
-    case pescatarian = "Pescatarian"
-    case keto = "Keto / Low-Carb"
-    case glutenFree = "Gluten-Free"
-    case dairyFree = "Dairy-Free"
-    case nutFree = "Nut-Free"
-    case peanutFree = "Peanut-Free"
-    case eggFree = "Egg-Free"
-    case soyFree = "Soy-Free"
-}
-
 private struct DieteryPreferancesScreen: View {
-    @Binding var screenStep: Int
-    @Binding var triggerHaptics: Bool
-    
-    @State private var restrictions: [Restriction: Bool] = [
-        .vegan: false,
-        .vegetarian: false,
-        .pescatarian: false,
-        .keto: false,
-        .glutenFree: false,
-        .dairyFree: false,
-        .nutFree: false,
-        .peanutFree: false,
-        .eggFree: false,
-        .soyFree: false
-    ]
-    
-    var selected: [Restriction] { restrictions.filter { $0.value }.map(\.key) }
+    @Binding var viewModel: OnboardingViewModel
+    //
+    //    @State private var restrictions: [Restriction: Bool] = [
+    //        .vegan: false,
+    //        .vegetarian: false,
+    //        .pescatarian: false,
+    //        .keto: false,
+    //        .glutenFree: false,
+    //        .dairyFree: false,
+    //        .nutFree: false,
+    //        .peanutFree: false,
+    //        .eggFree: false,
+    //        .soyFree: false
+    //    ]
     
     var body: some View {
         VStack {
@@ -753,37 +685,74 @@ private struct DieteryPreferancesScreen: View {
                 // the dietary choices choices
                 VStack{
                     HStack{
-                        RestrictionButton(restrictions: $restrictions, restriction: .vegan)
-                        RestrictionButton(restrictions: $restrictions, restriction: .vegetarian)
+                        Button {
+                            viewModel.restrictions.insert(.vegan)
+                        } label: {
+                            RestrictionButtonLabel(restrictionName: Restriction.vegan.rawValue, isSelected: viewModel.restrictions.contains(.vegan))
+                        }
+                        
+                        Button {
+                            viewModel.restrictions.insert(.vegetarian)
+                        } label: {
+                            RestrictionButtonLabel(restrictionName: Restriction.vegetarian.rawValue, isSelected: viewModel.restrictions.contains(.vegetarian))
+                        }
                     }
                     HStack{
-                        RestrictionButton(restrictions: $restrictions, restriction: .pescatarian)
-                        RestrictionButton(restrictions: $restrictions, restriction: .keto)
+                        Button {
+                            viewModel.restrictions.insert(.pescatarian)
+                        } label: {
+                            RestrictionButtonLabel(restrictionName: Restriction.pescatarian.rawValue, isSelected: viewModel.restrictions.contains(.pescatarian))
+                        }
+                        
+                        Button {
+                            viewModel.restrictions.insert(.keto)
+                        } label: {
+                            RestrictionButtonLabel(restrictionName: Restriction.keto.rawValue, isSelected: viewModel.restrictions.contains(.keto))
+                        }
                     }
                     HStack{
-                        RestrictionButton(restrictions: $restrictions, restriction: .glutenFree)
-                        RestrictionButton(restrictions: $restrictions, restriction: .dairyFree)
+                        Button {
+                            viewModel.restrictions.insert(.glutenFree)
+                        } label: {
+                            RestrictionButtonLabel(restrictionName: Restriction.glutenFree.rawValue, isSelected: viewModel.restrictions.contains(.glutenFree))                        }
+                        
+                        Button {
+                            viewModel.restrictions.insert(.dairyFree)
+                        } label: {
+                            RestrictionButtonLabel(restrictionName: Restriction.dairyFree.rawValue, isSelected: viewModel.restrictions.contains(.dairyFree))              }
                     }
                     HStack{
-                        RestrictionButton(restrictions: $restrictions, restriction: .nutFree)
-                        RestrictionButton(restrictions: $restrictions, restriction: .peanutFree)
+                        Button {
+                            viewModel.restrictions.insert(.nutFree)
+                        } label: {
+                            RestrictionButtonLabel(restrictionName: Restriction.nutFree.rawValue, isSelected: viewModel.restrictions.contains(.nutFree))                   }
+                        Button {
+                            viewModel.restrictions.insert(.peanutFree)
+                        } label: {
+                            RestrictionButtonLabel(restrictionName: Restriction.peanutFree.rawValue, isSelected: viewModel.restrictions.contains(.peanutFree))            }
                     }
                     HStack{
-                        RestrictionButton(restrictions: $restrictions, restriction: .eggFree)
-                        RestrictionButton(restrictions: $restrictions, restriction: .soyFree)
+                        Button {
+                            viewModel.restrictions.insert(.eggFree)
+                        } label: {
+                            RestrictionButtonLabel(restrictionName: Restriction.eggFree.rawValue, isSelected: viewModel.restrictions.contains(.eggFree))                  }
+                        Button {
+                            viewModel.restrictions.insert(.soyFree)
+                        } label: {
+                            RestrictionButtonLabel(restrictionName: Restriction.soyFree.rawValue, isSelected: viewModel.restrictions.contains(.soyFree))                  }
                     }
                     
                 }
                 .padding(.horizontal)
-                .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.3), trigger: restrictions)
+                .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.3), trigger: viewModel.restrictions)
                 
                 Spacer()
             }
         }
         .safeAreaInset(edge: .bottom) {
             SKActionButton(title: "Next", fillColour: Color("primary"), action: {
-                triggerHaptics.toggle()
-                screenStep += 1
+                viewModel.triggerHaptics.toggle()
+                viewModel.next()
             })
             .padding()
             .padding(.bottom, 40)
@@ -792,10 +761,9 @@ private struct DieteryPreferancesScreen: View {
 }
 
 private struct SetupScreen: View {
-    @Binding var screenStep: Int
+    @Binding var viewModel: OnboardingViewModel
     @Binding var isOnboardingComplete: Bool
-    @Binding var triggerHaptics: Bool
-    
+
     var body: some View {
         VStack {
             VStack{
@@ -816,6 +784,41 @@ private struct SetupScreen: View {
                     .padding(.bottom, 6)
                     .foregroundStyle(Color("text2"))
                 
+                VStack{
+                    Text("User Info for Testing")
+                        .font(.system(size: 16, weight: .regular, design: .monospaced))
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .foregroundStyle(Color("text1"))
+                    
+                    Text("name: \(viewModel.name)")
+                        .font(.system(size: 14, weight: .regular, design: .monospaced))
+                        .foregroundStyle(Color("text1"))
+                    
+                    Text("age: \(viewModel.age)")
+                        .font(.system(size: 14, weight: .regular, design: .monospaced))
+                        .foregroundStyle(Color("text1"))
+                    
+                    Text("weight: \(viewModel.weight)")
+                        .font(.system(size: 14, weight: .regular, design: .monospaced))
+                        .foregroundStyle(Color("text1"))
+                    
+                    Text("height: \(viewModel.height)")
+                        .font(.system(size: 14, weight: .regular, design: .monospaced))
+                        .foregroundStyle(Color("text1"))
+                    
+                    Text("gender: \(viewModel.gender?.rawValue ?? "nil gender")")
+                        .font(.system(size: 14, weight: .regular, design: .monospaced))
+                        .foregroundStyle(Color("text1"))
+                    
+                    Text("goal: \(viewModel.goal?.rawValue ?? "nil goal")")
+                        .font(.system(size: 14, weight: .regular, design: .monospaced))
+                        .foregroundStyle(Color("text1"))
+                    
+                    Text("restrictions: \(viewModel.restrictions)")
+                        .font(.system(size: 14, weight: .regular, design: .monospaced))
+                        .foregroundStyle(Color("text1"))
+                }
+                
                 Spacer()
             }
             .padding()
@@ -823,7 +826,7 @@ private struct SetupScreen: View {
         }
         .safeAreaInset(edge: .bottom) {
             SKActionButton(title: "Let's get started!", fillColour: Color("primary"), action: {
-                triggerHaptics.toggle()
+                viewModel.triggerHaptics.toggle()
                 isOnboardingComplete = true
             })
             .padding()
@@ -869,34 +872,25 @@ private struct GenderButton: View {
     }
 }
 
-private struct RestrictionButton: View {
-    @Binding var restrictions: [Restriction: Bool]
-    let restriction: Restriction
+private struct RestrictionButtonLabel: View {
+    let restrictionName: String
+    var isSelected: Bool
     var body: some View {
-        Button {
-            restrictions[restriction]?.toggle()
-        } label: {
-            Text(restriction.rawValue)
-                .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                .foregroundStyle(restrictions[restriction] == true ? Color("text3") : Color("text2"))
-                .padding(8)
-                .background(
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(restrictions[restriction] == true ? Color("primary") : Color("background2"))
-                )
-                .overlay {
-                    RoundedRectangle(cornerRadius: 4)
-                        .stroke(restrictions[restriction] == true ? Color("primary") : Color.clear)
-                }
-        }
+        Text(restrictionName)
+            .font(.system(size: 14, weight: .semibold, design: .monospaced))
+            .foregroundStyle(isSelected ? Color("text3") : Color("text2"))
+            .padding(8)
+            .background(
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(isSelected ? Color("primary") : Color("background2"))
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: 4)
+                    .stroke(isSelected ? Color("primary") : Color.clear)
+            }
     }
 }
 
-private struct TrendPoint: Identifiable {
-    let id = UUID()
-    let week: String
-    let y: Double
-}
 
 #Preview{
     OnboardingView(isOnboardingComplete: .constant(false))
