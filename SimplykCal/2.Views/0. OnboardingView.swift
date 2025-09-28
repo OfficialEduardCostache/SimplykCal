@@ -396,7 +396,7 @@ private struct DetailsScreen: View {
         .safeAreaInset(edge: .bottom) {
             SKActionButton(title: "Next", fillColour: Color("primary"), action: {
                 viewModel.triggerHaptics.toggle()
-                viewModel.screenStep += 1
+                viewModel.next()
             })
             .padding()
             .padding(.bottom, 40)

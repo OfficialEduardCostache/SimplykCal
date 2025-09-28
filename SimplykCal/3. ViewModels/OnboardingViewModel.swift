@@ -11,7 +11,7 @@ import SwiftUI
 @Observable
 class OnboardingViewModel{
     // screen variables
-    var screenStep: Int = 0
+    private(set) var screenStep: Int = 0
     var triggerHaptics: Bool = false
     let totalSteps: Int = 6
     let fadeDuration: Double = 0.4
