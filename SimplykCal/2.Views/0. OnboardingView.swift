@@ -7,27 +7,11 @@
 
 import SwiftUI
 import Charts
+import SwiftData
 
 struct OnboardingView: View {
     @State var viewModel: OnboardingViewModel = OnboardingViewModel()
-    
     @Binding var isOnboardingComplete: Bool
-
-
-    // Intercepts child screen writes to `screenStep` to perform fade-out → change → fade-in
-//    private var animatedScreenStep: Binding<Int> {
-//        Binding(
-//            get: { screenStep },
-//            set: { newValue in
-//                guard newValue != screenStep else { return }
-//                withAnimation(.easeInOut(duration: fadeDuration)) { fadeOpacity = 1 }
-//                DispatchQueue.main.asyncAfter(deadline: .now() + fadeDuration) {
-//                    screenStep = newValue
-//                    withAnimation(.easeInOut(duration: fadeDuration)) { fadeOpacity = 0 }
-//                }
-//            }
-//        )
-//    }
 
     var body: some View {
         ZStack{
@@ -55,7 +39,7 @@ struct OnboardingView: View {
             HStack{
                 // Back button
                 Button {
-                    viewModel.triggerHaptics.toggle()
+                    viewModel.triggerSucessfulHaptic.toggle()
                     viewModel.back()
                 } label: {
                     BackButtonLabel(isHidden: viewModel.screenStep == 0 ? true : false)
@@ -72,7 +56,7 @@ struct OnboardingView: View {
                 
                 // Skip button / not in use at the moment
                 Button {
-                    viewModel.triggerHaptics.toggle()
+                    viewModel.triggerSucessfulHaptic.toggle()
                     viewModel.next()
                 } label: {
                     Text("Skip")
@@ -89,11 +73,13 @@ struct OnboardingView: View {
                     .opacity(viewModel.fadeOpacity)
             }
             .padding(.top, 20)
-            .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.5), trigger: viewModel.triggerHaptics)
+            .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.5), trigger: viewModel.triggerSucessfulHaptic)
+            .sensoryFeedback(.impact(flexibility: .rigid, intensity: 0.7), trigger: viewModel.triggerErrorHaptic)
         }
     }
 }
 
+//MARK: INTRO SCREEN
 private struct IntroScreen: View {
     @Binding var viewModel: OnboardingViewModel
     
@@ -125,7 +111,7 @@ private struct IntroScreen: View {
         .padding()
         .safeAreaInset(edge: .bottom) {
             SKActionButton(title: "Next", fillColour: Color("primary"), action: {
-                viewModel.triggerHaptics.toggle()
+                viewModel.triggerSucessfulHaptic.toggle()
                 viewModel.next()
             })
             .padding()
@@ -134,8 +120,10 @@ private struct IntroScreen: View {
     }
 }
 
+//MARK: NAME SCREEN
 private struct NameScreen: View {
     @Binding var viewModel: OnboardingViewModel
+    @State var errorMessage: String? = nil
 
     var body: some View {
         VStack {
@@ -157,7 +145,7 @@ private struct NameScreen: View {
             }
             .padding()
             
-            SKTextField(text: $viewModel.name)
+            SKTextField(text: $viewModel.name, errorMessage: errorMessage)
                 .padding(.horizontal)
             
             Spacer()
@@ -166,8 +154,15 @@ private struct NameScreen: View {
         }
         .safeAreaInset(edge: .bottom) {
             SKActionButton(title: "Next", fillColour: Color("primary"), action: {
-                viewModel.triggerHaptics.toggle()
-                viewModel.next()
+                errorMessage = viewModel.validateUserName()
+                
+                if errorMessage == nil{
+                    viewModel.triggerSucessfulHaptic.toggle()
+                    viewModel.next()
+                }
+                else{
+                    viewModel.triggerErrorHaptic.toggle()
+                }
             })
             .padding()
             .padding(.bottom, 40)
@@ -178,6 +173,7 @@ private struct NameScreen: View {
 //MARK: DETAILS SCREEN
 private struct DetailsScreen: View {
     @Binding var viewModel: OnboardingViewModel
+    @State var errorMessage: String? = nil
 
     var body: some View {
         VStack{
@@ -189,7 +185,7 @@ private struct DetailsScreen: View {
                         .frame(width: 140, height: 140)
                         .shadow(color: Color("primary").opacity(0.3), radius: 5)
                     
-                    Text("Nice to meet you ____")
+                    Text("Nice to meet you \(viewModel.name)")
                         .font(.system(size: 16, weight: .bold, design: .monospaced))
                         .foregroundStyle(Color("text1"))
                         .padding(.bottom, 6)
@@ -379,7 +375,16 @@ private struct DetailsScreen: View {
                             GenderButton(title: "Female", isSelected: viewModel.gender == .female) {
                                 viewModel.gender = .female
                             }
-                            .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.3), trigger: viewModel.triggerHaptics)
+                            .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.3), trigger: viewModel.triggerSucessfulHaptic)
+                            
+                            
+                        }
+                        
+                        if let errorMessage{
+                            Text(errorMessage)
+                                .font(.system(size: 12, weight: .regular, design: .monospaced))
+                                .foregroundStyle(Color.red)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
                     .padding(.horizontal)
@@ -395,8 +400,15 @@ private struct DetailsScreen: View {
         }
         .safeAreaInset(edge: .bottom) {
             SKActionButton(title: "Next", fillColour: Color("primary"), action: {
-                viewModel.triggerHaptics.toggle()
-                viewModel.next()
+                errorMessage = viewModel.validateGender()
+                
+                if errorMessage == nil{
+                    viewModel.triggerSucessfulHaptic.toggle()
+                    viewModel.next()
+                }
+                else{
+                    viewModel.triggerErrorHaptic.toggle()
+                }
             })
             .padding()
             .padding(.bottom, 40)
@@ -407,6 +419,7 @@ private struct DetailsScreen: View {
 //MARK: GoalScreen
 private struct GoalScreen: View {
     @Binding var viewModel: OnboardingViewModel
+    @State var errorMessage: String? = nil
     
     var body: some View {
         VStack(spacing: 0) {
@@ -437,19 +450,30 @@ private struct GoalScreen: View {
                 SKActionButton(title: "Lose weight", fillColour: Color.green, textSize: 14, isSelected: viewModel.goal == .lose) {
                     viewModel.goal = .lose
                     viewModel.generateGraphPointsForLoss()
+                    errorMessage = viewModel.validateGoal()
                 }
                 
                 SKActionButton(title: "Maintain weight", fillColour: Color.orange, textSize: 14, isSelected: viewModel.goal == .maintain) {
                     viewModel.goal = .maintain
+                    errorMessage = viewModel.validateGoal()
                 }
                 
                 SKActionButton(title: "Gain weight", fillColour: Color.red, textSize: 14, isSelected: viewModel.goal == .gain) {
                     viewModel.goal = .gain
                     viewModel.generateGraphPointsForGain()
+                    errorMessage = viewModel.validateGoal()
                 }
             }
             .padding(.horizontal)
             .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.3), trigger: viewModel.goal)
+            
+            if let errorMessage{
+                Text(errorMessage)
+                    .font(.system(size: 12, weight: .regular, design: .monospaced))
+                    .foregroundStyle(Color.red)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+            }
             
             // if the goal is to lose weight
             if viewModel.goal == .lose {
@@ -632,8 +656,15 @@ private struct GoalScreen: View {
         }
         .safeAreaInset(edge: .bottom) {
             SKActionButton(title: "Next", fillColour: Color("primary"), action: {
-                viewModel.triggerHaptics.toggle()
-                viewModel.next()
+                errorMessage = viewModel.validateGoal()
+                
+                if errorMessage == nil{
+                    viewModel.triggerSucessfulHaptic.toggle()
+                    viewModel.next()
+                }
+                else{
+                    viewModel.triggerErrorHaptic.toggle()
+                }
             })
             .padding()
             .padding(.bottom, 40)
@@ -643,19 +674,6 @@ private struct GoalScreen: View {
 
 private struct DieteryPreferancesScreen: View {
     @Binding var viewModel: OnboardingViewModel
-    //
-    //    @State private var restrictions: [Restriction: Bool] = [
-    //        .vegan: false,
-    //        .vegetarian: false,
-    //        .pescatarian: false,
-    //        .keto: false,
-    //        .glutenFree: false,
-    //        .dairyFree: false,
-    //        .nutFree: false,
-    //        .peanutFree: false,
-    //        .eggFree: false,
-    //        .soyFree: false
-    //    ]
     
     var body: some View {
         VStack {
@@ -666,7 +684,7 @@ private struct DieteryPreferancesScreen: View {
                     .frame(width: 140, height: 140)
                     .shadow(color: Color("primary").opacity(0.3), radius: 5)
                 
-                Text("___ do you have any dietry restrictions?")
+                Text("\(viewModel.name) do you have any dietry restrictions?")
                     .font(.system(size: 16, weight: .bold, design: .monospaced))
                     .padding(.bottom, 6)
                     .foregroundStyle(Color("text1"))
@@ -686,60 +704,66 @@ private struct DieteryPreferancesScreen: View {
                 VStack{
                     HStack{
                         Button {
-                            viewModel.restrictions.insert(.vegan)
+                            viewModel.restrictions.append(.vegan)
                         } label: {
                             RestrictionButtonLabel(restrictionName: Restriction.vegan.rawValue, isSelected: viewModel.restrictions.contains(.vegan))
                         }
                         
                         Button {
-                            viewModel.restrictions.insert(.vegetarian)
+                            viewModel.restrictions.append(.vegetarian)
                         } label: {
                             RestrictionButtonLabel(restrictionName: Restriction.vegetarian.rawValue, isSelected: viewModel.restrictions.contains(.vegetarian))
                         }
                     }
                     HStack{
                         Button {
-                            viewModel.restrictions.insert(.pescatarian)
+                            viewModel.restrictions.append(.pescatarian)
                         } label: {
                             RestrictionButtonLabel(restrictionName: Restriction.pescatarian.rawValue, isSelected: viewModel.restrictions.contains(.pescatarian))
                         }
                         
                         Button {
-                            viewModel.restrictions.insert(.keto)
+                            viewModel.restrictions.append(.keto)
                         } label: {
                             RestrictionButtonLabel(restrictionName: Restriction.keto.rawValue, isSelected: viewModel.restrictions.contains(.keto))
                         }
                     }
                     HStack{
                         Button {
-                            viewModel.restrictions.insert(.glutenFree)
+                            viewModel.restrictions.append(.glutenFree)
                         } label: {
-                            RestrictionButtonLabel(restrictionName: Restriction.glutenFree.rawValue, isSelected: viewModel.restrictions.contains(.glutenFree))                        }
+                            RestrictionButtonLabel(restrictionName: Restriction.glutenFree.rawValue, isSelected: viewModel.restrictions.contains(.glutenFree))
+                        }
                         
                         Button {
-                            viewModel.restrictions.insert(.dairyFree)
+                            viewModel.restrictions.append(.dairyFree)
                         } label: {
-                            RestrictionButtonLabel(restrictionName: Restriction.dairyFree.rawValue, isSelected: viewModel.restrictions.contains(.dairyFree))              }
+                            RestrictionButtonLabel(restrictionName: Restriction.dairyFree.rawValue, isSelected: viewModel.restrictions.contains(.dairyFree))
+                        }
                     }
                     HStack{
                         Button {
-                            viewModel.restrictions.insert(.nutFree)
+                            viewModel.restrictions.append(.nutFree)
                         } label: {
-                            RestrictionButtonLabel(restrictionName: Restriction.nutFree.rawValue, isSelected: viewModel.restrictions.contains(.nutFree))                   }
+                            RestrictionButtonLabel(restrictionName: Restriction.nutFree.rawValue, isSelected: viewModel.restrictions.contains(.nutFree))
+                        }
                         Button {
-                            viewModel.restrictions.insert(.peanutFree)
+                            viewModel.restrictions.append(.peanutFree)
                         } label: {
-                            RestrictionButtonLabel(restrictionName: Restriction.peanutFree.rawValue, isSelected: viewModel.restrictions.contains(.peanutFree))            }
+                            RestrictionButtonLabel(restrictionName: Restriction.peanutFree.rawValue, isSelected: viewModel.restrictions.contains(.peanutFree))
+                        }
                     }
                     HStack{
                         Button {
-                            viewModel.restrictions.insert(.eggFree)
+                            viewModel.restrictions.append(.eggFree)
                         } label: {
-                            RestrictionButtonLabel(restrictionName: Restriction.eggFree.rawValue, isSelected: viewModel.restrictions.contains(.eggFree))                  }
+                            RestrictionButtonLabel(restrictionName: Restriction.eggFree.rawValue, isSelected: viewModel.restrictions.contains(.eggFree))
+                        }
                         Button {
-                            viewModel.restrictions.insert(.soyFree)
+                            viewModel.restrictions.append(.soyFree)
                         } label: {
-                            RestrictionButtonLabel(restrictionName: Restriction.soyFree.rawValue, isSelected: viewModel.restrictions.contains(.soyFree))                  }
+                            RestrictionButtonLabel(restrictionName: Restriction.soyFree.rawValue, isSelected: viewModel.restrictions.contains(.soyFree))
+                        }
                     }
                     
                 }
@@ -751,7 +775,7 @@ private struct DieteryPreferancesScreen: View {
         }
         .safeAreaInset(edge: .bottom) {
             SKActionButton(title: "Next", fillColour: Color("primary"), action: {
-                viewModel.triggerHaptics.toggle()
+                viewModel.triggerSucessfulHaptic.toggle()
                 viewModel.next()
             })
             .padding()
@@ -761,8 +785,11 @@ private struct DieteryPreferancesScreen: View {
 }
 
 private struct SetupScreen: View {
+    @Environment(\.modelContext) var modelContext
     @Binding var viewModel: OnboardingViewModel
     @Binding var isOnboardingComplete: Bool
+    
+    @Query private var users: [User]
 
     var body: some View {
         VStack {
@@ -773,7 +800,7 @@ private struct SetupScreen: View {
                     .frame(width: 140, height: 140)
                     .shadow(color: Color("primary").opacity(0.3), radius: 5)
                 
-                Text("All finished ___")
+                Text("All finished \(viewModel.name)")
                     .font(.system(size: 16, weight: .bold, design: .monospaced))
                     .padding(.bottom, 6)
                     .foregroundStyle(Color("text1"))
@@ -784,41 +811,6 @@ private struct SetupScreen: View {
                     .padding(.bottom, 6)
                     .foregroundStyle(Color("text2"))
                 
-                VStack{
-                    Text("User Info for Testing")
-                        .font(.system(size: 16, weight: .regular, design: .monospaced))
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .foregroundStyle(Color("text1"))
-                    
-                    Text("name: \(viewModel.name)")
-                        .font(.system(size: 14, weight: .regular, design: .monospaced))
-                        .foregroundStyle(Color("text1"))
-                    
-                    Text("age: \(viewModel.age)")
-                        .font(.system(size: 14, weight: .regular, design: .monospaced))
-                        .foregroundStyle(Color("text1"))
-                    
-                    Text("weight: \(viewModel.weight)")
-                        .font(.system(size: 14, weight: .regular, design: .monospaced))
-                        .foregroundStyle(Color("text1"))
-                    
-                    Text("height: \(viewModel.height)")
-                        .font(.system(size: 14, weight: .regular, design: .monospaced))
-                        .foregroundStyle(Color("text1"))
-                    
-                    Text("gender: \(viewModel.gender?.rawValue ?? "nil gender")")
-                        .font(.system(size: 14, weight: .regular, design: .monospaced))
-                        .foregroundStyle(Color("text1"))
-                    
-                    Text("goal: \(viewModel.goal?.rawValue ?? "nil goal")")
-                        .font(.system(size: 14, weight: .regular, design: .monospaced))
-                        .foregroundStyle(Color("text1"))
-                    
-                    Text("restrictions: \(viewModel.restrictions)")
-                        .font(.system(size: 14, weight: .regular, design: .monospaced))
-                        .foregroundStyle(Color("text1"))
-                }
-                
                 Spacer()
             }
             .padding()
@@ -826,8 +818,19 @@ private struct SetupScreen: View {
         }
         .safeAreaInset(edge: .bottom) {
             SKActionButton(title: "Let's get started!", fillColour: Color("primary"), action: {
-                viewModel.triggerHaptics.toggle()
+                viewModel.triggerSucessfulHaptic.toggle()
+                let newUser = viewModel.generateNewUser()
+                modelContext.insert(newUser)
                 isOnboardingComplete = true
+                
+                if let user = users.first{
+                    print(user.age.description)
+                    print(user.gender.rawValue)
+                    print(user.goal.rawValue)
+                    print(user.restrictions.count)
+                }else{
+                    print("User does not exist")
+                }
             })
             .padding()
             .padding(.bottom, 40)

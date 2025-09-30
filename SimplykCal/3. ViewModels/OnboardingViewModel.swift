@@ -12,7 +12,8 @@ import SwiftUI
 class OnboardingViewModel{
     // screen variables
     private(set) var screenStep: Int = 0
-    var triggerHaptics: Bool = false
+    var triggerSucessfulHaptic: Bool = false
+    var triggerErrorHaptic: Bool = false
     let totalSteps: Int = 6
     let fadeDuration: Double = 0.4
     var fadeOpacity: Double = 0
@@ -41,7 +42,7 @@ class OnboardingViewModel{
     }
     var graphData: [WeightGraphPoint] = []
     
-    var restrictions: Set<Restriction> = []
+    var restrictions: [Restriction] = []
     
     func decrementAge() { age = max(ageRange.lowerBound, age - 1) }
     func incrementAge() { age = min(ageRange.upperBound, age + 1) }
@@ -97,34 +98,59 @@ class OnboardingViewModel{
             value = newValue
         }
     }
+    
+    func generateNewUser() -> User{
+        let newUser = User(
+            name: name,
+            age: age,
+            height: height,
+            weight: weight,
+            gender: gender ?? .male,
+            goal: goal ?? .lose,
+            restrictions: restrictions)
+        
+        return newUser
+    }
 }
 
-enum Gender: String{
-    case male = "Male"
-    case female = "Female"
+// Validation
+extension OnboardingViewModel{
+    func validateUserName() -> String?{
+        if name.count < 3 || name.count > 16{
+            return ErrorTypes.nameTooLongOrTooShort.rawValue
+        }
+
+        return nil
+    }
+    
+    func validateGender() -> String?{
+        if gender == nil{
+            return ErrorTypes.noGenderSelected.rawValue
+        }
+        
+        return nil
+    }
+    
+    func validateGoal() -> String?{
+        if goal == nil{
+            return ErrorTypes.noGoalSelected.rawValue
+        }
+        
+        return nil
+    }
 }
 
-enum Goal: String{
-    case lose = "Lose"
-    case maintain = "Maintain"
-    case gain = "Gain"
-}
 
-enum Restriction: String, CaseIterable, Hashable {
-    case vegetarian = "Vegetarian"
-    case vegan = "Vegan"
-    case pescatarian = "Pescatarian"
-    case keto = "Keto / Low-Carb"
-    case glutenFree = "Gluten-Free"
-    case dairyFree = "Dairy-Free"
-    case nutFree = "Nut-Free"
-    case peanutFree = "Peanut-Free"
-    case eggFree = "Egg-Free"
-    case soyFree = "Soy-Free"
-}
 
 struct WeightGraphPoint: Identifiable {
     let id = UUID()
     let week: String
     let y: Double
 }
+
+enum ErrorTypes: String{
+    case nameTooLongOrTooShort = "Your name must be between 3 and 16 characters long"
+    case noGenderSelected = "You need to select a gender to continue"
+    case noGoalSelected = "You need to select a goal to continue"
+}
+

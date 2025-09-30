@@ -15,6 +15,6 @@ struct SimplykCalApp: App {
             RootView()
                 .ignoresSafeArea(edges: .bottom)
         }
-        //.modelContainer(for: [User.self, FoodEntryModel.self])
+        .modelContainer(for: [User.self])
     }
 }
