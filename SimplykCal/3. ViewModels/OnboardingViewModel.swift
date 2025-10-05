@@ -14,7 +14,7 @@ class OnboardingViewModel{
     private(set) var screenStep: Int = 0
     var triggerSucessfulHaptic: Bool = false
     var triggerErrorHaptic: Bool = false
-    let totalSteps: Int = 6
+    let totalSteps: Int = 7
     let fadeDuration: Double = 0.4
     var fadeOpacity: Double = 0
     

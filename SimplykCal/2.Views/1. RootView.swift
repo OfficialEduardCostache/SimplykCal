@@ -10,11 +10,12 @@ import SwiftData
 
 struct RootView: View {
     @State var tabBarViewModel: TabBarViewModel = TabBarViewModel()
-    @State var isOnboardingComplete: Bool = false
+    
+    @Query var users: [User]
     
     var body: some View {
         
-        if isOnboardingComplete == true{
+        if let user = users.first{
             ZStack {
                 switch tabBarViewModel.selectedTab {
                 case 0: HomeView(tabBarViewModel: tabBarViewModel)
@@ -39,7 +40,7 @@ struct RootView: View {
             }
         }
         else{
-            OnboardingView(isOnboardingComplete: $isOnboardingComplete)
+            OnboardingView()
         }
 
     }
