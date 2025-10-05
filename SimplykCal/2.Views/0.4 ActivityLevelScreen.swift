@@ -9,13 +9,11 @@ import SwiftUI
 
 struct ActivityLevelScreen: View{
     @Binding var viewModel: OnboardingViewModel
-    @State var errorMessage: String? = nil
-    @State var selection: ActivityLevel? = nil
     
     var body: some View{
         VStack{
             VStack{
-                switch selection {
+                switch viewModel.activity {
                 case .sedentary:
                     Image("mascot-activity-sedentary")
                         .resizable()
@@ -65,23 +63,28 @@ struct ActivityLevelScreen: View{
                     .multilineTextAlignment(.center)
             }
             .padding()
-            .animation(.snappy, value: selection)
+            .animation(.snappy, value: viewModel.activity)
             
             VStack{
-                SKButton(title: "Sedentary (little/no exercise)", isSelected: selection == .sedentary) {
-                    selection = .sedentary
+                SKButton(title: "Sedentary (little/no exercise)", isSelected: viewModel.activity == .sedentary) {
+                    viewModel.activity = .sedentary
+                    
                 }
-                SKButton(title: "Lightly active (1–3x/week)", isSelected: selection == .light) {
-                    selection = .light
+                SKButton(title: "Lightly active (1–3x/week)", isSelected: viewModel.activity == .light) {
+                    viewModel.activity = .light
+                    
                 }
-                SKButton(title: "Moderately active (3–5x/week)", isSelected: selection == .moderate) {
-                    selection = .moderate
+                SKButton(title: "Moderately active (3–5x/week)", isSelected: viewModel.activity == .moderate) {
+                    viewModel.activity = .moderate
+                    
                 }
-                SKButton(title: "Very active (6–7x/week)", isSelected: selection == .veryActive) {
-                    selection = .veryActive
+                SKButton(title: "Very active (6–7x/week)", isSelected: viewModel.activity == .veryActive) {
+                    viewModel.activity = .veryActive
+                    
                 }
-                SKButton(title: "Extremely active (athlete, labor job)", isSelected: selection == .extremelyActive) {
-                    selection = .extremelyActive
+                SKButton(title: "Extremely active (athlete, labor job)", isSelected: viewModel.activity == .extremelyActive) {
+                    viewModel.activity = .extremelyActive
+                    
                 }
             }
             .padding()
@@ -89,16 +92,9 @@ struct ActivityLevelScreen: View{
             Spacer()
         }
         .safeAreaInset(edge: .bottom) {
-            SKActionButton(title: "Next", fillColour: Color("primary"), action: {
-                errorMessage = viewModel.validateGender()
-                
-                if errorMessage == nil{
-                    viewModel.triggerSucessfulHaptic.toggle()
-                    viewModel.next()
-                }
-                else{
-                    viewModel.triggerErrorHaptic.toggle()
-                }
+            SKActionButton(title: "Next", fillColour: Color("primary"), isDisabled: !viewModel.isActivityValid(), action: {
+                viewModel.triggerSucessfulHaptic.toggle()
+                viewModel.next()
             })
             .padding()
             .padding(.bottom, 40)
@@ -106,13 +102,6 @@ struct ActivityLevelScreen: View{
     }
 }
 
-enum ActivityLevel{
-    case sedentary
-    case light
-    case moderate
-    case veryActive
-    case extremelyActive
-}
 
 #Preview {
     ActivityLevelScreen(viewModel: .constant(OnboardingViewModel()))

@@ -32,6 +32,8 @@ class OnboardingViewModel{
     
     var gender: Gender? = nil
     
+    var activity: ActivityLevel? = nil
+    
     var goal: Goal? = nil
     var paceForWeightLoss: Double = 50 {
         didSet { generateGraphPointsForLoss() }
@@ -87,6 +89,15 @@ class OnboardingViewModel{
         }
     }
     
+    func handleRestrictionSelection(restriction: Restriction) {
+        if let index = restrictions.firstIndex(of: restriction){
+            restrictions.remove(at: index)
+        }
+        else{
+            restrictions.append(restriction)
+        }
+    }
+    
     func generateGraphPointsForGain() {
         graphData.removeAll()
         var value = weight
@@ -106,6 +117,7 @@ class OnboardingViewModel{
             height: height,
             weight: weight,
             gender: gender ?? .male,
+            activity: activity ?? .sedentary,
             goal: goal ?? .lose,
             restrictions: restrictions)
         
@@ -115,20 +127,27 @@ class OnboardingViewModel{
 
 // Validation
 extension OnboardingViewModel{
-    func validateUserName() -> String?{
+    func isUsernameValid() -> Bool{
         if name.count < 3 || name.count > 16{
-            return ErrorTypes.nameTooLongOrTooShort.rawValue
+            return false
         }
 
-        return nil
+        return true
     }
     
-    func validateGender() -> String?{
+    func isGenderValid() -> Bool{
         if gender == nil{
-            return ErrorTypes.noGenderSelected.rawValue
+            return false
         }
         
-        return nil
+        return true
+    }
+    
+    func isActivityValid() -> Bool{
+        if activity == nil{
+            return false
+        }
+        return true
     }
     
     func validateGoal() -> String?{
@@ -138,9 +157,15 @@ extension OnboardingViewModel{
         
         return nil
     }
+    
+    func validateActivity() -> String?{
+        if activity == nil{
+            return ErrorTypes.noActivitySelected.rawValue
+        }
+        
+        return nil
+    }
 }
-
-
 
 struct WeightGraphPoint: Identifiable {
     let id = UUID()
@@ -152,5 +177,6 @@ enum ErrorTypes: String{
     case nameTooLongOrTooShort = "Your name must be between 3 and 16 characters long"
     case noGenderSelected = "You need to select a gender to continue"
     case noGoalSelected = "You need to select a goal to continue"
+    case noActivitySelected = "You need to select an activity level to continue"
 }
 

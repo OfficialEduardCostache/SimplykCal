@@ -20,6 +20,12 @@ class User{
         set { genderRaw = newValue.rawValue }
     }
     
+    private var activityRaw: String
+    var activity: ActivityLevel{
+        get { ActivityLevel(rawValue: activityRaw) ?? .sedentary }
+        set { activityRaw = newValue.rawValue }
+    }
+    
     private var goalRaw: String
     var goal: Goal {
         get { Goal(rawValue: goalRaw) ?? .maintain }
@@ -32,12 +38,13 @@ class User{
         set { restrictionsRaw = newValue.map(\.rawValue) }
     }
     
-    init(name: String, age: Double, height: Double, weight: Double, gender: Gender, goal: Goal, restrictions: [Restriction]) {
+    init(name: String, age: Double, height: Double, weight: Double, gender: Gender, activity: ActivityLevel, goal: Goal, restrictions: [Restriction]) {
         self.name = name
         self.age = age
         self.height = height
         self.weight = weight
         self.genderRaw = gender.rawValue
+        self.activityRaw = activity.rawValue
         self.goalRaw = goal.rawValue
         self.restrictionsRaw = restrictions.map(\.rawValue)
     }
@@ -66,4 +73,13 @@ enum Restriction: String{
     case peanutFree = "Peanut-Free"
     case eggFree = "Egg-Free"
     case soyFree = "Soy-Free"
+}
+
+
+enum ActivityLevel: String{
+    case sedentary = "Sedentary"
+    case light = "Light"
+    case moderate = "Moderate"
+    case veryActive = "Heavy"
+    case extremelyActive = "Extreme"
 }

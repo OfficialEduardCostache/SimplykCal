@@ -39,63 +39,73 @@ struct DieteryPreferancesScreen: View {
                 VStack{
                     HStack{
                         Button {
-                            viewModel.restrictions.append(.vegan)
+                            viewModel.handleRestrictionSelection(restriction: .vegan)
+                            viewModel.triggerSucessfulHaptic.toggle()
                         } label: {
                             RestrictionButtonLabel(restrictionName: Restriction.vegan.rawValue, isSelected: viewModel.restrictions.contains(.vegan))
                         }
                         
                         Button {
-                            viewModel.restrictions.append(.vegetarian)
+                            viewModel.handleRestrictionSelection(restriction: .vegetarian)
+                            viewModel.triggerSucessfulHaptic.toggle()
                         } label: {
                             RestrictionButtonLabel(restrictionName: Restriction.vegetarian.rawValue, isSelected: viewModel.restrictions.contains(.vegetarian))
                         }
                     }
                     HStack{
                         Button {
-                            viewModel.restrictions.append(.pescatarian)
+                            viewModel.handleRestrictionSelection(restriction: .pescatarian)
+                            viewModel.triggerSucessfulHaptic.toggle()
                         } label: {
                             RestrictionButtonLabel(restrictionName: Restriction.pescatarian.rawValue, isSelected: viewModel.restrictions.contains(.pescatarian))
                         }
                         
                         Button {
-                            viewModel.restrictions.append(.keto)
+                            viewModel.handleRestrictionSelection(restriction: .keto)
+                            viewModel.triggerSucessfulHaptic.toggle()
                         } label: {
                             RestrictionButtonLabel(restrictionName: Restriction.keto.rawValue, isSelected: viewModel.restrictions.contains(.keto))
                         }
                     }
                     HStack{
                         Button {
-                            viewModel.restrictions.append(.glutenFree)
+                            viewModel.handleRestrictionSelection(restriction: .glutenFree)
+                            viewModel.triggerSucessfulHaptic.toggle()
                         } label: {
                             RestrictionButtonLabel(restrictionName: Restriction.glutenFree.rawValue, isSelected: viewModel.restrictions.contains(.glutenFree))
                         }
                         
                         Button {
-                            viewModel.restrictions.append(.dairyFree)
+                            viewModel.handleRestrictionSelection(restriction: .dairyFree)
+                            viewModel.triggerSucessfulHaptic.toggle()
                         } label: {
                             RestrictionButtonLabel(restrictionName: Restriction.dairyFree.rawValue, isSelected: viewModel.restrictions.contains(.dairyFree))
                         }
                     }
                     HStack{
                         Button {
-                            viewModel.restrictions.append(.nutFree)
+                            viewModel.handleRestrictionSelection(restriction: .nutFree)
+                            viewModel.triggerSucessfulHaptic.toggle()
                         } label: {
                             RestrictionButtonLabel(restrictionName: Restriction.nutFree.rawValue, isSelected: viewModel.restrictions.contains(.nutFree))
                         }
                         Button {
-                            viewModel.restrictions.append(.peanutFree)
+                            viewModel.handleRestrictionSelection(restriction: .peanutFree)
+                            viewModel.triggerSucessfulHaptic.toggle()
                         } label: {
                             RestrictionButtonLabel(restrictionName: Restriction.peanutFree.rawValue, isSelected: viewModel.restrictions.contains(.peanutFree))
                         }
                     }
                     HStack{
                         Button {
-                            viewModel.restrictions.append(.eggFree)
+                            viewModel.handleRestrictionSelection(restriction: .eggFree)
+                            viewModel.triggerSucessfulHaptic.toggle()
                         } label: {
                             RestrictionButtonLabel(restrictionName: Restriction.eggFree.rawValue, isSelected: viewModel.restrictions.contains(.eggFree))
                         }
                         Button {
-                            viewModel.restrictions.append(.soyFree)
+                            viewModel.handleRestrictionSelection(restriction: .soyFree)
+                            viewModel.triggerSucessfulHaptic.toggle()
                         } label: {
                             RestrictionButtonLabel(restrictionName: Restriction.soyFree.rawValue, isSelected: viewModel.restrictions.contains(.soyFree))
                         }
@@ -117,4 +127,8 @@ struct DieteryPreferancesScreen: View {
             .padding(.bottom, 40)
         }
     }
+}
+
+#Preview{
+    DieteryPreferancesScreen(viewModel: .constant(OnboardingViewModel()))
 }

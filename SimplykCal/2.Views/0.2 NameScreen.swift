@@ -9,8 +9,7 @@ import SwiftUI
 
 struct NameScreen: View {
     @Binding var viewModel: OnboardingViewModel
-    @State var errorMessage: String? = nil
-
+    
     var body: some View {
         VStack {
             VStack{
@@ -31,7 +30,7 @@ struct NameScreen: View {
             }
             .padding()
             
-            SKTextField(text: $viewModel.name, errorMessage: errorMessage)
+            SKTextField(text: $viewModel.name)
                 .padding(.horizontal)
             
             Spacer()
@@ -39,19 +38,16 @@ struct NameScreen: View {
             
         }
         .safeAreaInset(edge: .bottom) {
-            SKActionButton(title: "Next", fillColour: Color("primary"), action: {
-                errorMessage = viewModel.validateUserName()
-                
-                if errorMessage == nil{
-                    viewModel.triggerSucessfulHaptic.toggle()
-                    viewModel.next()
-                }
-                else{
-                    viewModel.triggerErrorHaptic.toggle()
-                }
+            SKActionButton(title: "Next", fillColour: Color("primary"), isDisabled: !viewModel.isUsernameValid(), action: {
+                viewModel.triggerSucessfulHaptic.toggle()
+                viewModel.next()
             })
             .padding()
             .padding(.bottom, 40)
         }
     }
+}
+
+#Preview{
+    NameScreen(viewModel: .constant(OnboardingViewModel()))
 }

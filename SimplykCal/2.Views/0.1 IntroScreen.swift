@@ -46,3 +46,7 @@ struct IntroScreen: View {
         }
     }
 }
+
+#Preview{
+    IntroScreen(viewModel: .constant(OnboardingViewModel()))
+}

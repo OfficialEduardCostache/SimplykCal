@@ -38,18 +38,18 @@ struct GoalScreen: View {
             
 
             HStack{
-                SKActionButton(title: "Lose weight", fillColour: Color.green, textSize: 14, isSelected: viewModel.goal == .lose) {
+                SKButton(title: "Lose weight", isSelected: viewModel.goal == .lose) {
                     viewModel.goal = .lose
                     viewModel.generateGraphPointsForLoss()
                     errorMessage = viewModel.validateGoal()
                 }
                 
-                SKActionButton(title: "Maintain weight", fillColour: Color.orange, textSize: 14, isSelected: viewModel.goal == .maintain) {
+                SKButton(title: "Maintain weight", isSelected: viewModel.goal == .maintain) {
                     viewModel.goal = .maintain
                     errorMessage = viewModel.validateGoal()
                 }
                 
-                SKActionButton(title: "Gain weight", fillColour: Color.red, textSize: 14, isSelected: viewModel.goal == .gain) {
+                SKButton(title: "Gain weight", isSelected: viewModel.goal == .gain) {
                     viewModel.goal = .gain
                     viewModel.generateGraphPointsForGain()
                     errorMessage = viewModel.validateGoal()
@@ -261,4 +261,8 @@ struct GoalScreen: View {
             .padding(.bottom, 40)
         }
     }
+}
+
+#Preview{
+    GoalScreen(viewModel: .constant(OnboardingViewModel()))
 }

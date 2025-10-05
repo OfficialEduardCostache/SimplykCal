@@ -9,7 +9,6 @@ import SwiftUI
 
 struct DetailsScreen: View {
     @Binding var viewModel: OnboardingViewModel
-    @State var errorMessage: String? = nil
 
     var body: some View {
         VStack{
@@ -215,13 +214,6 @@ struct DetailsScreen: View {
                             
                             
                         }
-                        
-                        if let errorMessage{
-                            Text(errorMessage)
-                                .font(.system(size: 12, weight: .regular, design: .monospaced))
-                                .foregroundStyle(Color.red)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
                     }
                     .padding(.horizontal)
                     .padding(.bottom)
@@ -235,19 +227,16 @@ struct DetailsScreen: View {
             Spacer()
         }
         .safeAreaInset(edge: .bottom) {
-            SKActionButton(title: "Next", fillColour: Color("primary"), action: {
-                errorMessage = viewModel.validateGender()
-                
-                if errorMessage == nil{
-                    viewModel.triggerSucessfulHaptic.toggle()
-                    viewModel.next()
-                }
-                else{
-                    viewModel.triggerErrorHaptic.toggle()
-                }
+            SKActionButton(title: "Next", fillColour: Color("primary"), isDisabled: !viewModel.isGenderValid(), action: {
+                viewModel.triggerSucessfulHaptic.toggle()
+                viewModel.next()
             })
             .padding()
             .padding(.bottom, 40)
         }
     }
+}
+
+#Preview{
+    DetailsScreen(viewModel: .constant(OnboardingViewModel()))
 }

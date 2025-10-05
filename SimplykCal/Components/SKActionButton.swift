@@ -12,15 +12,15 @@ struct SKActionButton: View {
     let fillColour: Color
     let icon: Image?
     let textSize: CGFloat?
-    var isSelected: Bool?
+    var isDisabled: Bool?
     var action: () -> Void
     
-    init(title: String, fillColour: Color, icon: Image? = nil, textSize: CGFloat = 18, isSelected: Bool = true, action: @escaping () -> Void) {
+    init(title: String, fillColour: Color, icon: Image? = nil, textSize: CGFloat = 18, isDisabled: Bool = false, action: @escaping () -> Void) {
         self.title = title
         self.fillColour = fillColour
         self.icon = icon
         self.textSize = textSize
-        self.isSelected = isSelected
+        self.isDisabled = isDisabled
         self.action = action
     }
 
@@ -44,14 +44,19 @@ struct SKActionButton: View {
             .frame(maxWidth: .infinity)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(fillColour.opacity(isSelected ?? true ? 1 : 0.12))
+                    .fill(fillColour.opacity(isDisabled ?? false ? 0.12 : 1))
             )
         }
+        .disabled(isDisabled ?? false)
     }
 }
 
 #Preview {
     SKActionButton(title: "Test", fillColour: Color.red, icon: Image(systemName: "plus")) {
+        //
+    }
+    
+    SKActionButton(title: "test", fillColour: .orange, isDisabled: true) {
         //
     }
 }

@@ -24,8 +24,7 @@ struct OnboardingView: View {
                 GoalScreen(viewModel: $viewModel)
             } else if viewModel.screenStep == 5 {
                 DieteryPreferancesScreen(viewModel: $viewModel)
-            }
-            else if viewModel.screenStep == 6{
+            }else if viewModel.screenStep == 6{
                 SetupScreen(viewModel: $viewModel)
             }
 
