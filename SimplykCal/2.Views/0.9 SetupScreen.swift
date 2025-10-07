@@ -44,15 +44,6 @@ struct SetupScreen: View {
                 viewModel.triggerSucessfulHaptic.toggle()
                 let newUser = viewModel.generateNewUser()
                 modelContext.insert(newUser)
-                
-                if let user = users.first{
-                    print(user.age.description)
-                    print(user.gender.rawValue)
-                    print(user.goal.rawValue)
-                    print(user.restrictions.count)
-                }else{
-                    print("User does not exist")
-                }
             })
             .padding()
             .padding(.bottom, 40)

@@ -12,22 +12,29 @@ struct OnboardingView: View {
 
     var body: some View {
         ZStack{
-            if viewModel.screenStep == 0 {
+            switch viewModel.screenStep {
+            case 0:
                 IntroScreen(viewModel: $viewModel)
-            } else if viewModel.screenStep == 1 {
+            case 1:
                 NameScreen(viewModel: $viewModel)
-            } else if viewModel.screenStep == 2 {
+            case 2:
                 DetailsScreen(viewModel: $viewModel)
-            } else if viewModel.screenStep == 3 {
+            case 3:
                 ActivityLevelScreen(viewModel: $viewModel)
-            } else if viewModel.screenStep == 4 {
+            case 4:
                 GoalScreen(viewModel: $viewModel)
-            } else if viewModel.screenStep == 5 {
+            case 5:
+                ExtendedGoalScreen(viewModel: $viewModel)
+            case 6:
+                GoalSummaryScreen()
+            case 7:
                 DieteryPreferancesScreen(viewModel: $viewModel)
-            }else if viewModel.screenStep == 6{
+            case 8:
                 SetupScreen(viewModel: $viewModel)
+            default:
+                EmptyView()
             }
-
+            
             Rectangle()
                 .fill(Color("background"))
                 .opacity(viewModel.fadeOpacity)

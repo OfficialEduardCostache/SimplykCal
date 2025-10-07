@@ -14,15 +14,14 @@ class OnboardingViewModel{
     private(set) var screenStep: Int = 0
     var triggerSucessfulHaptic: Bool = false
     var triggerErrorHaptic: Bool = false
-    let totalSteps: Int = 7
+    let totalSteps: Int = 9
     let fadeDuration: Double = 0.4
     var fadeOpacity: Double = 0
     
     // user details
     var name: String = ""
     
-    var age: Double = 25
-    let ageRange: ClosedRange<Double> = 16...80
+    var birthday: Date = Calendar.current.date(from: DateComponents(year: 2000, month: 6, day: 22))!
     
     var height: Double = 177
     let heightRange: ClosedRange<Double> = 120...250
@@ -45,15 +44,6 @@ class OnboardingViewModel{
     var graphData: [WeightGraphPoint] = []
     
     var restrictions: [Restriction] = []
-    
-    func decrementAge() { age = max(ageRange.lowerBound, age - 1) }
-    func incrementAge() { age = min(ageRange.upperBound, age + 1) }
-    
-    func decrementHeight() { height = max(heightRange.lowerBound, height - 1) }
-    func incrementHeight() { height = min(heightRange.upperBound, height + 1) }
-    
-    func decrementWeight() { weight = max(weightRange.lowerBound, weight - 1) }
-    func incrementWeight() { weight = min(weightRange.upperBound, weight + 1) }
     
     func setScreenStepAnimated(_ newValue: Int) {
         guard newValue != screenStep else { return }
@@ -113,7 +103,7 @@ class OnboardingViewModel{
     func generateNewUser() -> User{
         let newUser = User(
             name: name,
-            age: age,
+            birthday: birthday,
             height: height,
             weight: weight,
             gender: gender ?? .male,
@@ -122,6 +112,16 @@ class OnboardingViewModel{
             restrictions: restrictions)
         
         return newUser
+    }
+    
+    func formatBirthday(date: Date) -> String{
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d MMMM yyyy"  // 👈 e.g. "22 June 2000"
+        formatter.locale = Locale(identifier: "en_US_POSIX")  // ensures consistent month names
+
+        let formattedDate = formatter.string(from: date)
+        
+        return formattedDate
     }
 }
 
@@ -179,4 +179,5 @@ enum ErrorTypes: String{
     case noGoalSelected = "You need to select a goal to continue"
     case noActivitySelected = "You need to select an activity level to continue"
 }
+
 

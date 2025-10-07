@@ -6,11 +6,12 @@
 //
 
 import SwiftData
+import Foundation
 
 @Model
 class User{
     var name: String
-    var age: Double
+    var birthday: Date
     var height: Double
     var weight: Double
     
@@ -38,9 +39,9 @@ class User{
         set { restrictionsRaw = newValue.map(\.rawValue) }
     }
     
-    init(name: String, age: Double, height: Double, weight: Double, gender: Gender, activity: ActivityLevel, goal: Goal, restrictions: [Restriction]) {
+    init(name: String, birthday: Date, height: Double, weight: Double, gender: Gender, activity: ActivityLevel, goal: Goal, restrictions: [Restriction]) {
         self.name = name
-        self.age = age
+        self.birthday = birthday
         self.height = height
         self.weight = weight
         self.genderRaw = gender.rawValue

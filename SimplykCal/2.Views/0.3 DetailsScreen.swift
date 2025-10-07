@@ -9,6 +9,7 @@ import SwiftUI
 
 struct DetailsScreen: View {
     @Binding var viewModel: OnboardingViewModel
+    @State var showBirthdayPicker: Bool = false
 
     var body: some View {
         VStack{
@@ -34,167 +35,49 @@ struct DetailsScreen: View {
                 //MARK: Age
                 VStack(spacing: 20){
                     VStack{
-                        VStack(spacing: -20) {
-                            Text("Age")
-                                .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                                .foregroundStyle(Color("text1"))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                //.background(Color.blue)
-                            
-                            Text(String(format: "%.0f", viewModel.age))
-                                .font(.system(size: 18, weight: .regular, design: .monospaced))
-                                .foregroundStyle(Color("text2"))
-                                .frame(maxWidth: .infinity, alignment: .center)
-                                //.background(Color.red)
-                        }
+                        Text("Height")
+                            .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                            .foregroundStyle(Color("text1"))
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        HStack {
-                            Button {
-                                viewModel.decrementAge()
-                            } label: {
-                                Image(systemName: "minus")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .foregroundStyle(Color.black)
-                                    .frame(width: 22, height: 22)
-                                    .background(
-                                        Circle()
-                                            .fill(Color("primary"))
-                                            .frame(width: 32, height: 32)
-                                    )
+                        BirthdayContainer(birthdayAsString: viewModel.formatBirthday(date: viewModel.birthday))
+                            .onTapGesture {
+                                showBirthdayPicker = true
                             }
-
-                            Slider(value: $viewModel.age, in: viewModel.ageRange, step: 1.0)
-                                .tint(Color("primary"))
-                                .padding(.horizontal, 6)
-                            
-                            
-                            Button {
-                                viewModel.incrementAge()
-                            } label: {
-                                Image(systemName: "plus")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .foregroundStyle(Color.black)
-                                    .frame(width: 22, height: 22)
-                                    .background(
-                                        Circle()
-                                            .fill(Color("primary"))
-                                            .frame(width: 32, height: 32)
-                                    )
-                            }
-                        }
                     }
                     .padding(.horizontal)
                     
                     //MARK: Height
                     VStack{
-                        VStack(spacing: -20) {
-                            Text("Height")
-                                .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                                .foregroundStyle(Color("text1"))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            
-                            Text(String(format: "%.0fcm", viewModel.height))
-                                .font(.system(size: 18, weight: .regular, design: .monospaced))
-                                .foregroundStyle(Color("text2"))
-                                .frame(maxWidth: .infinity, alignment: .center)
-                        }
+                        Text("Height")
+                            .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                            .foregroundStyle(Color("text1"))
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        HStack {
-                            Button {
-                                viewModel.decrementHeight()
-                            } label: {
-                                Image(systemName: "minus")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .foregroundStyle(Color.black)
-                                    .frame(width: 22, height: 22)
-                                    .background(
-                                        Circle()
-                                            .fill(Color("primary"))
-                                            .frame(width: 32, height: 32)
-                                    )
-                            }
-
-                            Slider(value: $viewModel.height, in: viewModel.heightRange, step: 1)
-                                .tint(Color("primary"))
-                                .padding(.horizontal, 6)
+                        SKSlider(value: $viewModel.height, range: 130...210, step: 0.5, unitOfMeasure: "cm")
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color("background2"))
+                            )
                             
-                            
-                            Button {
-                                viewModel.incrementHeight()
-                            } label: {
-                                Image(systemName: "plus")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .foregroundStyle(Color.black)
-                                    .frame(width: 22, height: 22)
-                                    .background(
-                                        Circle()
-                                            .fill(Color("primary"))
-                                            .frame(width: 32, height: 32)
-                                    )
-                            }
-                        }
                     }
                     .padding(.horizontal)
 
                     //MARK: Weight
                     VStack{
-                        VStack(spacing: -20) {
-                            Text("Weight")
-                                .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                                .foregroundStyle(Color("text1"))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                //.background(Color.blue)
-                            
-                            Text(String(format: "%.0fkg", viewModel.weight))
-                                .font(.system(size: 18, weight: .regular, design: .monospaced))
-                                .foregroundStyle(Color("text2"))
-                                .frame(maxWidth: .infinity, alignment: .center)
-                                //.background(Color.red)
-                        }
+                        Text("Weight")
+                            .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                            .foregroundStyle(Color("text1"))
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        HStack {
-                            Button {
-                                viewModel.decrementWeight()
-                            } label: {
-                                Image(systemName: "minus")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .foregroundStyle(Color.black)
-                                    .frame(width: 22, height: 22)
-                                    .background(
-                                        Circle()
-                                            .fill(Color("primary"))
-                                            .frame(width: 32, height: 32)
-                                    )
-                            }
-
-                            Slider(value: $viewModel.weight, in: viewModel.weightRange, step: 1.0)
-                                .tint(Color("primary"))
-                                .padding(.horizontal, 6)
+                        SKSlider(value: $viewModel.weight, range: 35...220, step: 0.5, unitOfMeasure: "kg")
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color("background2"))
+                            )
                             
-                            
-                            Button {
-                                viewModel.incrementWeight()
-                            } label: {
-                                Image(systemName: "plus")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .foregroundStyle(Color.black)
-                                    .frame(width: 22, height: 22)
-                                    .background(
-                                        Circle()
-                                            .fill(Color("primary"))
-                                            .frame(width: 32, height: 32)
-                                    )
-                            }
-                        }
                     }
                     .padding(.horizontal)
-
 
                     // gender
                     VStack{
@@ -220,7 +103,6 @@ struct DetailsScreen: View {
                 }
                 
             }
-            .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.3), trigger: viewModel.age)
             .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.3), trigger: viewModel.height)
             .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.3), trigger: viewModel.weight)
             
@@ -234,9 +116,146 @@ struct DetailsScreen: View {
             .padding()
             .padding(.bottom, 40)
         }
+        .sheet(isPresented: $showBirthdayPicker, onDismiss: {
+            showBirthdayPicker = false
+        }) {
+            BirthdayPickerSheet(date: $viewModel.birthday)
+                .presentationDetents([.fraction(0.25)])
+        }
+    }
+}
+
+private struct BirthdayContainer: View {
+    var birthdayAsString: String
+    
+    var body: some View {
+        HStack{
+            Text(birthdayAsString)
+                .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                .foregroundStyle(Color("text1"))
+                .padding(.vertical)
+                .padding(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            Image(systemName: "chevron.down")
+                .padding(.trailing)
+                .font(.system(size: 14, weight: .semibold, design: .monospaced))
+        }
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color("background2"))
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color("background3"), lineWidth: 4)
+        }
+    }
+}
+
+private struct BirthdayPickerSheet: View {
+    @Binding var date: Date
+
+    // Local wheels
+    @State private var day: Int
+    @State private var month: Int    // 1...12
+    @State private var year: Int
+
+    private let calendar = Calendar.current
+    private let monthNames = Calendar.current.monthSymbols
+
+    // Bounds: now-16 down to (now-16)-100
+    private var currentYear: Int { calendar.component(.year, from: .now) }
+    private var upperYear: Int { currentYear - 16 }
+    private var lowerYear: Int { upperYear - 100 }
+
+    // Init from the binding
+    init(date: Binding<Date>) {
+        _date = date
+        let comps = Calendar.current.dateComponents([.day, .month, .year], from: date.wrappedValue)
+        _day   = State(initialValue: comps.day ?? 1)
+        _month = State(initialValue: comps.month ?? 1)
+        _year  = State(initialValue: min(max(comps.year ?? 2000, (Calendar.current.component(.year, from: .now) - 16) - 100),
+                                         Calendar.current.component(.year, from: .now) - 16))
+    }
+    
+    var body: some View {
+        ZStack{
+            Color("background").ignoresSafeArea()
+            
+            HStack {
+                // Day
+                Picker("Day", selection: $day) {
+                    ForEach(validDaysInMonth, id: \.self) { d in
+                        Text("\(d)").tag(d)
+                    }
+                }
+                .pickerStyle(.wheel)
+                .frame(maxWidth: .infinity)
+                
+                // Month (names)
+                Picker("Month", selection: $month) {
+                    ForEach(1...12, id: \.self) { m in
+                        Text(monthNames[m - 1]).tag(m)
+                    }
+                }
+                .pickerStyle(.wheel)
+                .frame(maxWidth: .infinity)
+                
+                // Year (bounded)
+                Picker("Year", selection: $year) {
+                    ForEach(lowerYear...upperYear, id: \.self) { y in
+                        Text(String(y)).tag(y)
+                    }
+                }
+                .pickerStyle(.wheel)
+                .frame(maxWidth: .infinity)
+            }
+            .onAppear {
+                // Make sure the initial wheels respect bounds & valid days
+                clampYearIntoBounds()
+                clampDayIfNeeded()
+                syncToBinding()
+            }
+            .onChange(of: month) { _, _ in clampDayIfNeeded(); syncToBinding() }
+            .onChange(of: year)  { _, _ in clampYearIntoBounds(); clampDayIfNeeded(); syncToBinding() }
+            .onChange(of: day)   { _, _ in syncToBinding() }
+        }
+        
+    }
+    
+    private var validDaysInMonth: [Int] {
+        let comps = DateComponents(year: year, month: month)
+        guard let date = calendar.date(from: comps),
+              let range = calendar.range(of: .day, in: .month, for: date)
+        else { return Array(1...28) }
+        return Array(range)
+    }
+
+    private func clampDayIfNeeded() {
+        let maxDay = validDaysInMonth.last ?? 28
+        if day > maxDay { day = maxDay }
+        if day < 1 { day = 1 }
+    }
+
+    private func clampYearIntoBounds() {
+        if year > upperYear { year = upperYear }
+        if year < lowerYear { year = lowerYear }
+    }
+
+    private func syncToBinding() {
+        let comps = DateComponents(year: year, month: month, day: day)
+        if let newDate = calendar.date(from: comps) {
+            date = newDate
+        }
     }
 }
 
 #Preview{
-    DetailsScreen(viewModel: .constant(OnboardingViewModel()))
+    ZStack{
+        Color("background").ignoresSafeArea()
+        
+        DetailsScreen(viewModel: .constant(OnboardingViewModel()))
+
+    }
 }
