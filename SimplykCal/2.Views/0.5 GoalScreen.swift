@@ -40,7 +40,7 @@ struct GoalScreen: View {
             VStack{
                 SKButton(title: "Lose weight", isSelected: viewModel.goal == .lose, icon: Image(systemName: "chart.line.downtrend.xyaxis"), alignment: .leading) {
                     viewModel.goal = .lose
-                    viewModel.generateGraphPointsForLoss()
+//                    viewModel.generateGraphPointsForLoss()
                     errorMessage = viewModel.validateGoal()
                 }
                 
@@ -51,7 +51,7 @@ struct GoalScreen: View {
                 
                 SKButton(title: "Gain weight", isSelected: viewModel.goal == .gain, icon: Image(systemName: "chart.line.uptrend.xyaxis"), alignment: .leading) {
                     viewModel.goal = .gain
-                    viewModel.generateGraphPointsForGain()
+//                    viewModel.generateGraphPointsForGain()
                     errorMessage = viewModel.validateGoal()
                 }
             }

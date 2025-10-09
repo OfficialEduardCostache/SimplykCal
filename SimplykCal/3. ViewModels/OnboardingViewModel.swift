@@ -20,30 +20,32 @@ class OnboardingViewModel{
     
     // user details
     var name: String = ""
-    
     var birthday: Date = Calendar.current.date(from: DateComponents(year: 2000, month: 6, day: 22))!
-    
     var height: Double = 177
-    let heightRange: ClosedRange<Double> = 120...250
-    
+    let heightRange: ClosedRange<Double> = 130...210
     var weight: Double = 70
-    let weightRange: ClosedRange<Double> = 35...105
-    
+    let weightRange: ClosedRange<Double> = 35...220
     var gender: Gender? = nil
-    
     var activity: ActivityLevel? = nil
-    
     var goal: Goal? = nil
-    var paceForWeightLoss: Double = 50 {
-        didSet { generateGraphPointsForLoss() }
-    }
-
-    var paceForWeightGain: Double = 50 {
-        didSet { generateGraphPointsForGain() }
-    }
-    var graphData: [WeightGraphPoint] = []
-    
     var restrictions: [Restriction] = []
+    var bmr: Double = 0
+    var tdee: Double = 0
+    var dailyCalories: Double = 0
+    
+    var targetWeight: Double = 0
+    
+    init(mockData: Bool = false) {
+        if mockData {
+            self.name = "Eduard"
+            self.gender = .male
+            self.activity = .moderate
+            self.goal = .lose
+            self.weight = 67
+            self.height = 174
+            self.birthday = Calendar.current.date(from: DateComponents(year: 2000, month: 6, day: 22))!
+        }
+    }
     
     func setScreenStepAnimated(_ newValue: Int) {
         guard newValue != screenStep else { return }
@@ -66,37 +68,13 @@ class OnboardingViewModel{
     
     func next()  { setScreenStepAnimated(screenStep + 1) }
     func back()  { setScreenStepAnimated(max(0, screenStep - 1)) }
-
-    func generateGraphPointsForLoss() {
-        graphData.removeAll()
-        var value = weight
-        let fraction = paceForWeightLoss / 100.0 / 100.0
-        for num in 1...6 {
-            let delta = value * fraction
-            let newValue = value - delta
-            graphData.append(WeightGraphPoint(week: "W\(num)", y: newValue))
-            value = newValue
-        }
-    }
-    
+  
     func handleRestrictionSelection(restriction: Restriction) {
         if let index = restrictions.firstIndex(of: restriction){
             restrictions.remove(at: index)
         }
         else{
             restrictions.append(restriction)
-        }
-    }
-    
-    func generateGraphPointsForGain() {
-        graphData.removeAll()
-        var value = weight
-        let fraction = paceForWeightGain / 100.0 / 100.0
-        for num in 1...6 {
-            let delta = value * fraction
-            let newValue = value + delta
-            graphData.append(WeightGraphPoint(week: "W\(num)", y: newValue))
-            value = newValue
         }
     }
     
@@ -114,7 +92,7 @@ class OnboardingViewModel{
         return newUser
     }
     
-    func formatBirthday(date: Date) -> String{
+    func formetDate(date: Date) -> String{
         let formatter = DateFormatter()
         formatter.dateFormat = "d MMMM yyyy"  // 👈 e.g. "22 June 2000"
         formatter.locale = Locale(identifier: "en_US_POSIX")  // ensures consistent month names
@@ -122,6 +100,50 @@ class OnboardingViewModel{
         let formattedDate = formatter.string(from: date)
         
         return formattedDate
+    }
+    
+    func getYearsFromBirthday() -> Double {
+        let calendar = Calendar.current
+        let ageComponents = calendar.dateComponents([.year], from: birthday, to: Date())
+        return Double(ageComponents.year ?? 0)
+    }
+}
+
+//MARK: Calorie Functions
+extension OnboardingViewModel{
+    func calculateBMR() {
+        let age = getYearsFromBirthday()
+
+        bmr = 10 * weight + 6.25 * height - 5 * age
+
+        switch gender {
+        case .male:   bmr += 5
+        case .female: bmr -= 161
+        case .none:   print("ERROR: Gender is nil in calculateBMR()")
+        }
+    }
+    
+    func calculateTDEE(){
+        switch activity{
+        case .sedentary:
+            tdee = bmr * 1.2
+        case .light:
+            tdee = bmr * 1.375
+        case .moderate:
+            tdee = bmr * 1.55
+        case .veryActive:
+            tdee = bmr * 1.725
+        case .extremelyActive:
+            tdee = bmr * 1.9
+        case .none:
+            print("ERROR: function 'calculateTDEE()' activity is nil")
+        }
+    }
+    
+    func calculateDailyCalories(kgPerWeek: Double){
+        let dailyDeficit: Double = (kgPerWeek * 7700) / 7
+        
+        dailyCalories = tdee - dailyDeficit
     }
 }
 

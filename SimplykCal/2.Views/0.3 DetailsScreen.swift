@@ -32,15 +32,15 @@ struct DetailsScreen: View {
                 }
                 .padding()
                 
-                //MARK: Age
+                //MARK: Birthday
                 VStack(spacing: 20){
                     VStack{
-                        Text("Height")
+                        Text("Birthday")
                             .font(.system(size: 14, weight: .semibold, design: .monospaced))
                             .foregroundStyle(Color("text1"))
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        BirthdayContainer(birthdayAsString: viewModel.formatBirthday(date: viewModel.birthday))
+                        BirthdayContainer(birthdayAsString: viewModel.formetDate(date: viewModel.birthday))
                             .onTapGesture {
                                 showBirthdayPicker = true
                             }
@@ -54,7 +54,7 @@ struct DetailsScreen: View {
                             .foregroundStyle(Color("text1"))
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        SKSlider(value: $viewModel.height, range: 130...210, step: 0.5, unitOfMeasure: "cm")
+                        SKSlider(value: $viewModel.height, range: viewModel.heightRange, step: 0.5, unitOfMeasure: "cm")
                             .background(
                                 RoundedRectangle(cornerRadius: 10)
                                     .fill(Color("background2"))
@@ -70,7 +70,7 @@ struct DetailsScreen: View {
                             .foregroundStyle(Color("text1"))
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        SKSlider(value: $viewModel.weight, range: 35...220, step: 0.5, unitOfMeasure: "kg")
+                        SKSlider(value: $viewModel.weight, range: viewModel.weightRange, step: 0.5, unitOfMeasure: "kg")
                             .background(
                                 RoundedRectangle(cornerRadius: 10)
                                     .fill(Color("background2"))
