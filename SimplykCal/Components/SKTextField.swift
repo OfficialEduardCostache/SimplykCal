@@ -54,7 +54,7 @@ struct SKTextField: View {
                         .foregroundStyle(focused ? Color("text1") : Color("text2"))
                         .frame(width: 18)
                 }
-
+                
                 TextField("", text: $text, prompt: Text(placeholder).foregroundStyle(Color("text2").opacity(0.5)).font(.system(size: 14, weight: .regular, design: .monospaced)))
                     .foregroundStyle(Color("text1")) // typed text color
                     .focused($focused)

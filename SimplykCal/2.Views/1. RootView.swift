@@ -10,6 +10,7 @@ import SwiftData
 
 struct RootView: View {
     @State var tabBarViewModel: TabBarViewModel = TabBarViewModel()
+    @State var previewVM = OnboardingViewModel(mockData: true)
     
     @Query var users: [User]
     
@@ -43,7 +44,12 @@ struct RootView: View {
 //            OnboardingView()
 //        }
 
-        OnboardingView()
+        //OnboardingView()
+        
+        ZStack {
+            Color("background").ignoresSafeArea()
+            ExtendedGoalScreen(viewModel: $previewVM)
+        }
     }
 }
 

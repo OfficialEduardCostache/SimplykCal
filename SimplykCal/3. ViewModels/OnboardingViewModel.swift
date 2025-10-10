@@ -40,7 +40,7 @@ class OnboardingViewModel{
             self.name = "Eduard"
             self.gender = .male
             self.activity = .moderate
-            self.goal = .lose
+            self.goal = .gain
             self.weight = 67
             self.height = 174
             self.birthday = Calendar.current.date(from: DateComponents(year: 2000, month: 6, day: 22))!
@@ -140,10 +140,16 @@ extension OnboardingViewModel{
         }
     }
     
-    func calculateDailyCalories(kgPerWeek: Double){
+    func calculateCalorieDeficit(kgPerWeek: Double){
         let dailyDeficit: Double = (kgPerWeek * 7700) / 7
         
         dailyCalories = tdee - dailyDeficit
+    }
+    
+    func calculateCalorieSurplus(kgPerWeek: Double){
+        let dailySurplus: Double = (kgPerWeek * 7700) / 7
+        
+        dailyCalories = tdee + dailySurplus
     }
 }
 
