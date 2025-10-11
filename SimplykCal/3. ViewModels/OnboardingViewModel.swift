@@ -92,20 +92,34 @@ class OnboardingViewModel{
         return newUser
     }
     
-    func formetDate(date: Date) -> String{
-        let formatter = DateFormatter()
-        formatter.dateFormat = "d MMMM yyyy"  // 👈 e.g. "22 June 2000"
-        formatter.locale = Locale(identifier: "en_US_POSIX")  // ensures consistent month names
-
-        let formattedDate = formatter.string(from: date)
-        
-        return formattedDate
+    func formatDate(date: Date) -> String{
+        date.formatted(.dateTime.day().month(.wide).year())
     }
     
     func getYearsFromBirthday() -> Double {
         let calendar = Calendar.current
         let ageComponents = calendar.dateComponents([.year], from: birthday, to: Date())
         return Double(ageComponents.year ?? 0)
+    }
+    
+    func dateByAdding(days: Int, to date: Date) -> Date {
+        Calendar.current.date(byAdding: .day, value: days, to: date) ?? date
+    }
+    
+    func updateExpectedEndDate(bodyWeightPerWeek: Double) -> Date{
+        if weight > targetWeight{
+            let differenceInWeight: Double = weight - targetWeight
+            let daysToTargetWeight: Int = Int((differenceInWeight / bodyWeightPerWeek) * 7)
+            
+            return dateByAdding(days: daysToTargetWeight, to: Date.now)
+        }
+        else if weight < targetWeight{
+            let differenceInWeight: Double = targetWeight - weight
+            let daysToTargetWeight: Int = Int((differenceInWeight / bodyWeightPerWeek) * 7)
+            
+            return dateByAdding(days: daysToTargetWeight, to: Date.now)
+        }
+        return Date.now
     }
 }
 
@@ -140,16 +154,21 @@ extension OnboardingViewModel{
         }
     }
     
-    func calculateCalorieDeficit(kgPerWeek: Double){
-        let dailyDeficit: Double = (kgPerWeek * 7700) / 7
+    func calculateNewCalories(bodyWeightPerWeek: Double) {
+        calculateBMR()
+        calculateTDEE()
         
-        dailyCalories = tdee - dailyDeficit
-    }
-    
-    func calculateCalorieSurplus(kgPerWeek: Double){
-        let dailySurplus: Double = (kgPerWeek * 7700) / 7
-        
-        dailyCalories = tdee + dailySurplus
+        guard bodyWeightPerWeek > 0 else {
+            dailyCalories = tdee
+            return
+        }
+
+        let dailyDifference = (bodyWeightPerWeek * 7700) / 7
+        switch goal {
+        case .lose: dailyCalories = tdee - dailyDifference
+        case .gain: dailyCalories = tdee + dailyDifference
+        default:    dailyCalories = tdee
+        }
     }
 }
 

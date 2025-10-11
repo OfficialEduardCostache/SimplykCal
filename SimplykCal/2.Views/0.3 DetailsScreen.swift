@@ -40,7 +40,7 @@ struct DetailsScreen: View {
                             .foregroundStyle(Color("text1"))
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        BirthdayContainer(birthdayAsString: viewModel.formetDate(date: viewModel.birthday))
+                        BirthdayContainer(birthdayAsString: viewModel.formatDate(date: viewModel.birthday))
                             .onTapGesture {
                                 showBirthdayPicker = true
                             }
