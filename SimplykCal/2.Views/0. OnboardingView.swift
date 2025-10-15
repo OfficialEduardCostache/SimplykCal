@@ -49,9 +49,9 @@ struct OnboardingView: View {
             case 5:
                 ExtendedGoalScreen(viewModel: $viewModel)
             case 6:
-                GoalSummaryScreen(viewModel: $viewModel)
+                MacroBalancingScreen(viewModel: $viewModel)
             case 7:
-                DieteryPreferancesScreen(viewModel: $viewModel)
+                GoalSummaryScreen(viewModel: $viewModel)
             case 8:
                 SetupScreen(viewModel: $viewModel)
             default:

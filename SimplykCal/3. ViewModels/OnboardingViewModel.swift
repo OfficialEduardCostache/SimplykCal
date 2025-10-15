@@ -31,8 +31,10 @@ class OnboardingViewModel{
     var restrictions: [Restriction] = []
     var bmr: Double = 0
     var tdee: Double = 0
-    var dailyCalories: Double = 0
+    var macros: Macros = Macros(calories: 0, protein: 0, fats: 0, carbs: 0)
     var expectedEndDate: Date = Date.now
+    var carbFatBalance: CarbFatBalance? = nil
+    var proteinIntake: ProteinIntake = .moderate
     
     var weeklyWeight: Double = 0.0
     var weeklyPercentage: Double = 0.5 {
@@ -59,7 +61,7 @@ class OnboardingViewModel{
             self.goal = .lose
             self.weight = 67
             self.targetWeight = 67
-            self.dailyCalories = 2500
+            self.macros = Macros(calories: 200, protein: 150, fats: 100, carbs: 100)
             self.height = 174
             self.birthday = Calendar.current.date(from: DateComponents(year: 2000, month: 6, day: 22))!
         }
@@ -201,15 +203,15 @@ extension OnboardingViewModel{
     
     func calculateNewCalories() {
         guard self.weeklyWeight > 0 else {
-            self.dailyCalories = self.tdee
+            self.macros.calories = self.tdee
             return
         }
 
         let dailyDifference = (self.weeklyWeight * 7700) / 7
         switch goal {
-        case .lose: self.dailyCalories = self.tdee - dailyDifference
-        case .gain: self.dailyCalories = self.tdee + dailyDifference
-        default:    self.dailyCalories = self.tdee
+        case .lose: self.macros.calories = self.tdee - dailyDifference
+        case .gain: self.macros.calories = self.tdee + dailyDifference
+        default:    self.macros.calories = self.tdee
         }
     }
     
@@ -222,6 +224,28 @@ extension OnboardingViewModel{
     
     func syncTargetWeight(){
         self.targetWeight = self.weight
+    }
+}
+
+//MARK: Macro function
+extension OnboardingViewModel{
+    func updateProteinIntake(selectionAsSliderValue: Double){
+        switch selectionAsSliderValue{
+        case 0:
+            self.proteinIntake = .low
+        case 1:
+            self.proteinIntake = .moderate
+        case 2:
+            self.proteinIntake = .high
+        case 3:
+            self.proteinIntake = .extraHigh
+        default:
+            self.proteinIntake = .moderate
+        }
+    }
+    
+    func calculateMacroDistribution(){
+        // TODO: complete this function
     }
 }
 

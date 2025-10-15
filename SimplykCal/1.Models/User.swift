@@ -84,3 +84,24 @@ enum ActivityLevel: String{
     case veryActive = "Heavy"
     case extremelyActive = "Extreme"
 }
+
+enum CarbFatBalance: String{
+    case balanced = "Balanced"
+    case lowCarb = "Low Carb"
+    case lowFat = "Low Fat"
+    case keto = "Keto"
+}
+
+enum ProteinIntake: String{
+    case low = "Low Protein"
+    case moderate = "Moderate Protein"
+    case high = "High Protein"
+    case extraHigh = "Extra High Protein"
+}
+
+struct Macros{
+    var calories: Double
+    var protein: Double
+    var fats: Double
+    var carbs: Double
+}

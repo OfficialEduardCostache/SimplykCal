@@ -16,7 +16,7 @@ struct ExtendedGoalScreen: View {
                 HStack{
                     //MARK: Calories container
                     VStack(alignment: .leading){
-                        Text(String(format: "%.0f", viewModel.dailyCalories))
+                        Text(String(format: "%.0f", viewModel.macros.calories))
                             .font(.system(size: 16, weight: .bold, design: .monospaced))
                             .foregroundStyle(Color("text1"))
                         
