@@ -40,6 +40,7 @@ struct SKSlider: View{
                 Text(formattedTempValue)
                     .font(.system(size: 18, weight: .semibold, design: .monospaced))
                     .foregroundStyle(Color("text1"))
+                    .contentTransition(.numericText(value: tempValue))
 
                 if let unitOfMeasure = unitOfMeasure{
                     Text(unitOfMeasure)

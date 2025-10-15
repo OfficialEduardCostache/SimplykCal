@@ -32,16 +32,34 @@ class OnboardingViewModel{
     var bmr: Double = 0
     var tdee: Double = 0
     var dailyCalories: Double = 0
+    var expectedEndDate: Date = Date.now
     
-    var targetWeight: Double = 0
+    var weeklyWeight: Double = 0.0
+    var weeklyPercentage: Double = 0.5 {
+        didSet {
+            updateWeeklyMontlyVariables()
+            calculateNewCalories()
+            updateExpectedEndDate()
+        }
+    }
+    var monthlyWeight: Double = 0.0
+    var monthlyPercentage: Double = 0.0
+    
+    var targetWeight: Double = 0 {
+        didSet {
+            updateExpectedEndDate()
+        }
+    }
     
     init(mockData: Bool = false) {
         if mockData {
             self.name = "Eduard"
             self.gender = .male
             self.activity = .moderate
-            self.goal = .gain
+            self.goal = .lose
             self.weight = 67
+            self.targetWeight = 67
+            self.dailyCalories = 2500
             self.height = 174
             self.birthday = Calendar.current.date(from: DateComponents(year: 2000, month: 6, day: 22))!
         }
@@ -66,8 +84,28 @@ class OnboardingViewModel{
         )
     }
     
-    func next()  { setScreenStepAnimated(screenStep + 1) }
-    func back()  { setScreenStepAnimated(max(0, screenStep - 1)) }
+    func next(){
+        if self.screenStep == 4 && self.goal == .maintain{
+            setScreenStepAnimated(6)
+        }
+        else{
+            setScreenStepAnimated(screenStep + 1)
+        }
+    }
+    func back(){
+        if self.screenStep == 6 && self.goal == .maintain{
+            setScreenStepAnimated(4)
+        }
+        else{
+            setScreenStepAnimated(max(0, screenStep - 1))
+        }
+
+    }
+
+    func isGoalSummaryScreen() -> Bool{
+        print("screen step 7")
+        return screenStep == 7
+    }
   
     func handleRestrictionSelection(restriction: Restriction) {
         if let index = restrictions.firstIndex(of: restriction){
@@ -106,20 +144,27 @@ class OnboardingViewModel{
         Calendar.current.date(byAdding: .day, value: days, to: date) ?? date
     }
     
-    func updateExpectedEndDate(bodyWeightPerWeek: Double) -> Date{
-        if weight > targetWeight{
-            let differenceInWeight: Double = weight - targetWeight
-            let daysToTargetWeight: Int = Int((differenceInWeight / bodyWeightPerWeek) * 7)
-            
-            return dateByAdding(days: daysToTargetWeight, to: Date.now)
+    func updateExpectedEndDate(){
+        guard weeklyWeight > 0 else {
+            self.expectedEndDate = Date.now
+            return
         }
-        else if weight < targetWeight{
-            let differenceInWeight: Double = targetWeight - weight
-            let daysToTargetWeight: Int = Int((differenceInWeight / bodyWeightPerWeek) * 7)
+        
+        if self.weight > self.targetWeight{
+            let differenceInWeight: Double = self.weight - self.targetWeight
+            let daysToTargetWeight: Int = Int((differenceInWeight / self.weeklyWeight) * 7)
             
-            return dateByAdding(days: daysToTargetWeight, to: Date.now)
+            self.expectedEndDate = dateByAdding(days: daysToTargetWeight, to: Date.now)
         }
-        return Date.now
+        else if self.weight < self.targetWeight{
+            let differenceInWeight: Double = self.targetWeight - self.weight
+            let daysToTargetWeight: Int = Int((differenceInWeight / self.weeklyWeight) * 7)
+            
+            self.expectedEndDate = self.dateByAdding(days: daysToTargetWeight, to: Date.now)
+        }
+        else{
+            self.expectedEndDate = Date.now
+        }
     }
 }
 
@@ -128,7 +173,7 @@ extension OnboardingViewModel{
     func calculateBMR() {
         let age = getYearsFromBirthday()
 
-        bmr = 10 * weight + 6.25 * height - 5 * age
+        self.bmr = 10 * self.weight + 6.25 * self.height - 5 * age
 
         switch gender {
         case .male:   bmr += 5
@@ -140,35 +185,43 @@ extension OnboardingViewModel{
     func calculateTDEE(){
         switch activity{
         case .sedentary:
-            tdee = bmr * 1.2
+            self.tdee = self.bmr * 1.2
         case .light:
-            tdee = bmr * 1.375
+            self.tdee = self.bmr * 1.375
         case .moderate:
-            tdee = bmr * 1.55
+            self.tdee = self.bmr * 1.55
         case .veryActive:
-            tdee = bmr * 1.725
+            self.tdee = self.bmr * 1.725
         case .extremelyActive:
-            tdee = bmr * 1.9
+            self.tdee = self.bmr * 1.9
         case .none:
             print("ERROR: function 'calculateTDEE()' activity is nil")
         }
     }
     
-    func calculateNewCalories(bodyWeightPerWeek: Double) {
-        calculateBMR()
-        calculateTDEE()
-        
-        guard bodyWeightPerWeek > 0 else {
-            dailyCalories = tdee
+    func calculateNewCalories() {
+        guard self.weeklyWeight > 0 else {
+            self.dailyCalories = self.tdee
             return
         }
 
-        let dailyDifference = (bodyWeightPerWeek * 7700) / 7
+        let dailyDifference = (self.weeklyWeight * 7700) / 7
         switch goal {
-        case .lose: dailyCalories = tdee - dailyDifference
-        case .gain: dailyCalories = tdee + dailyDifference
-        default:    dailyCalories = tdee
+        case .lose: self.dailyCalories = self.tdee - dailyDifference
+        case .gain: self.dailyCalories = self.tdee + dailyDifference
+        default:    self.dailyCalories = self.tdee
         }
+    }
+    
+    func updateWeeklyMontlyVariables() {
+        self.weeklyWeight = (self.weeklyPercentage / 100) * self.weight
+        
+        self.monthlyWeight = self.weeklyWeight * 4
+        self.monthlyPercentage = self.weeklyPercentage * 4
+    }
+    
+    func syncTargetWeight(){
+        self.targetWeight = self.weight
     }
 }
 

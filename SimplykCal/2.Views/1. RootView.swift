@@ -44,12 +44,12 @@ struct RootView: View {
 //            OnboardingView()
 //        }
 
-        //OnboardingView()
-        
-        ZStack {
-            Color("background").ignoresSafeArea()
-            ExtendedGoalScreen(viewModel: $previewVM)
-        }
+        OnboardingView()
+
+//        ZStack {
+//            Color("background").ignoresSafeArea()
+//            ExtendedGoalScreen(viewModel: $previewVM)
+//        }
     }
 }
 

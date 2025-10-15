@@ -32,8 +32,8 @@ struct DetailsScreen: View {
                 }
                 .padding()
                 
-                //MARK: Birthday
-                VStack(spacing: 20){
+                ScrollView{
+                    //MARK: Birthday
                     VStack{
                         Text("Birthday")
                             .font(.system(size: 14, weight: .semibold, design: .monospaced))
@@ -101,6 +101,7 @@ struct DetailsScreen: View {
                     .padding(.horizontal)
                     .padding(.bottom)
                 }
+                .scrollIndicators(.hidden)
                 
             }
             .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.3), trigger: viewModel.height)
@@ -112,6 +113,8 @@ struct DetailsScreen: View {
             SKActionButton(title: "Next", fillColour: Color("primary"), isDisabled: !viewModel.isGenderValid(), action: {
                 viewModel.triggerSucessfulHaptic.toggle()
                 viewModel.next()
+                viewModel.syncTargetWeight()
+                viewModel.calculateBMR()
             })
             .padding()
             .padding(.bottom, 40)

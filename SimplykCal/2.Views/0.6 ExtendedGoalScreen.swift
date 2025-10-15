@@ -10,19 +10,6 @@ import SwiftUI
 struct ExtendedGoalScreen: View {
     @Binding var viewModel: OnboardingViewModel
     
-    @State var testValueForSlider: Double = 0.6
-    @State var textWeekKG: String = ""
-    @State var textWeekBW: String = ""
-    @State var textMonthKG: String = ""
-    @State var textMonthBW: String = ""
-    @State var bodyWeightPerWeek: Double = 0.0
-    
-    @State var expectedEndDate: Date = Date.now
-    
-    init(viewModel: Binding<OnboardingViewModel>){
-        self._viewModel = viewModel
-    }
-    
     var body: some View {
         if let goal = viewModel.goal{
             VStack{
@@ -30,10 +17,12 @@ struct ExtendedGoalScreen: View {
                     //MARK: Calories container
                     VStack(alignment: .leading){
                         Text(String(format: "%.0f", viewModel.dailyCalories))
-                            .font(.system(size: 14, weight: .bold, design: .monospaced))
+                            .font(.system(size: 16, weight: .bold, design: .monospaced))
+                            .foregroundStyle(Color("text1"))
                         
                         Text("Daily Calories")
                             .font(.system(size: 14, weight: .light, design: .monospaced))
+                            .foregroundStyle(Color("text2"))
                     }
                     .frame(maxWidth: .infinity)
                     .frame(height: 60)
@@ -44,11 +33,13 @@ struct ExtendedGoalScreen: View {
                     
                     //MARK: Date container
                     VStack(alignment: .leading){
-                        Text(viewModel.formatDate(date: expectedEndDate))
+                        Text(viewModel.formatDate(date: viewModel.expectedEndDate))
                             .font(.system(size: 14, weight: .bold, design: .monospaced))
+                            .foregroundStyle(Color("text1"))
                         
                         Text("Expected End Date")
                             .font(.system(size: 14, weight: .light, design: .monospaced))
+                            .foregroundStyle(Color("text2"))
                     }
                     .frame(maxWidth: .infinity)
                     .frame(height: 60)
@@ -64,6 +55,7 @@ struct ExtendedGoalScreen: View {
                 //MARK: Target weight slider
                 Text("What is your target weight?")
                     .font(.system(size: 16, weight: .bold, design: .monospaced))
+                    .foregroundStyle(Color("text1"))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.bottom)
                     .padding(.horizontal)
@@ -75,38 +67,33 @@ struct ExtendedGoalScreen: View {
                     )
                     .padding(.horizontal)
                     .padding(.bottom)
-                    .onChange(of: viewModel.targetWeight) { _, _ in
-                        expectedEndDate = viewModel.updateExpectedEndDate(bodyWeightPerWeek: bodyWeightPerWeek)
-                    }
 
                 
                 //MARK: Rate of goal slider
                 Text("How fast do you want to get there?")
                     .font(.system(size: 16, weight: .bold, design: .monospaced))
+                    .foregroundStyle(Color("text1"))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.bottom)
                     .padding(.horizontal)
                 
-                Slider(value: $testValueForSlider, in: 0.25...1.0, step: 0.01)
+                Slider(value: $viewModel.weeklyPercentage, in: 0.25...1.0, step: 0.01)
                     .tint(Color("primary"))
                     .padding(.bottom)
                     .padding(.horizontal)
-                    .onChange(of: testValueForSlider) { _, _ in
-                        updateValuesForTextFields()
-                        viewModel.calculateNewCalories(bodyWeightPerWeek: bodyWeightPerWeek)
-                        expectedEndDate = viewModel.updateExpectedEndDate(bodyWeightPerWeek: bodyWeightPerWeek)
-                    }
                 
                 //MARK: Information container
                 VStack{
                     HStack{
                         Text(goal == .lose ? "-" : "+")
                             .font(.system(size: 16, weight: .regular, design: .monospaced))
+                            .foregroundStyle(Color("text1"))
                         
                         HStack(spacing: 2) {
-                            Text("\(textWeekKG)")
+                            Text(String(format: "%.3f", viewModel.weeklyWeight))
                                 .font(.system(size: 16, weight: .semibold, design: .monospaced))
                                 .foregroundStyle(Color("text1"))
+
                             
                             Text("kg")
                                 .font(.system(size: 16, weight: .bold, design: .monospaced))
@@ -124,9 +111,10 @@ struct ExtendedGoalScreen: View {
                         }
                         
                         HStack(spacing: 2) {
-                            Text("\(textWeekBW)")
+                            Text(String(format: "%.2f", viewModel.weeklyPercentage))
                                 .font(.system(size: 16, weight: .semibold, design: .monospaced))
                                 .foregroundStyle(Color("text1"))
+                                
                             
                             Text("% BW")
                                 .font(.system(size: 16, weight: .bold, design: .monospaced))
@@ -154,9 +142,10 @@ struct ExtendedGoalScreen: View {
                             .font(.system(size: 16, weight: .regular, design: .monospaced))
                         
                         HStack(spacing: 2) {
-                            Text("\(textMonthKG)")
+                            Text(String(format: "%.3f", viewModel.monthlyWeight))
                                 .font(.system(size: 16, weight: .semibold, design: .monospaced))
                                 .foregroundStyle(Color("text1"))
+
                             
                             Text("kg")
                                 .font(.system(size: 16, weight: .bold, design: .monospaced))
@@ -174,9 +163,10 @@ struct ExtendedGoalScreen: View {
                         }
                         
                         HStack(spacing: 2) {
-                            Text("\(textMonthBW)")
+                            Text(String(format: "%.2f", viewModel.monthlyPercentage))
                                 .font(.system(size: 16, weight: .semibold, design: .monospaced))
                                 .foregroundStyle(Color("text1"))
+
                             
                             Text("% BW")
                                 .font(.system(size: 16, weight: .bold, design: .monospaced))
@@ -195,6 +185,7 @@ struct ExtendedGoalScreen: View {
                         
                         Text("Per Month")
                             .font(.system(size: 14, weight: .regular, design: .monospaced))
+                            .foregroundStyle(Color("text1"))
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .padding(.horizontal)
@@ -203,9 +194,8 @@ struct ExtendedGoalScreen: View {
                 Spacer()
             }
             .onAppear(perform: {
-                viewModel.targetWeight = viewModel.weight
-                updateValuesForTextFields()
-                viewModel.calculateNewCalories(bodyWeightPerWeek: bodyWeightPerWeek)
+                viewModel.updateWeeklyMontlyVariables()
+                viewModel.calculateNewCalories()
             })
             //MARK: Next Button
             .safeAreaInset(edge: .bottom) {
@@ -220,16 +210,6 @@ struct ExtendedGoalScreen: View {
         else{
             EmptyView()
         }
-    }
-    
-    func updateValuesForTextFields() {
-        bodyWeightPerWeek = (testValueForSlider / 100) * viewModel.weight
-        
-        textWeekKG = String(format: "%.3f", bodyWeightPerWeek)
-        textWeekBW = String(format: "%.2f", testValueForSlider)
-        
-        textMonthKG = String(format: "%.3f", bodyWeightPerWeek * 4)
-        textMonthBW = String(format: "%.2f", testValueForSlider * 4)
     }
 }
 

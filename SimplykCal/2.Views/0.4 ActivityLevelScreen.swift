@@ -95,6 +95,8 @@ struct ActivityLevelScreen: View{
             SKActionButton(title: "Next", fillColour: Color("primary"), isDisabled: !viewModel.isActivityValid(), action: {
                 viewModel.triggerSucessfulHaptic.toggle()
                 viewModel.next()
+                viewModel.calculateTDEE()
+                viewModel.calculateNewCalories()
             })
             .padding()
             .padding(.bottom, 40)

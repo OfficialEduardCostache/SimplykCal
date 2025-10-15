@@ -129,6 +129,27 @@ struct DieteryPreferancesScreen: View {
     }
 }
 
+private struct RestrictionButtonLabel: View {
+    let restrictionName: String
+    var isSelected: Bool
+    var body: some View {
+        Text(restrictionName)
+            .font(.system(size: 14, weight: .semibold, design: .monospaced))
+            .foregroundStyle(isSelected ? Color("text3") : Color("text2"))
+            .padding(8)
+            .background(
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(isSelected ? Color("primary") : Color("background2"))
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: 4)
+                    .stroke(isSelected ? Color("primary") : Color.clear)
+            }
+    }
+}
+
+
+
 #Preview{
     DieteryPreferancesScreen(viewModel: .constant(OnboardingViewModel()))
 }
