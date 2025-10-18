@@ -32,11 +32,11 @@ struct SKButton: View {
             .frame(height: 48)
             .frame(maxWidth: .infinity, alignment: alignment ?? .center)
             .background(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .fill(isSelected ? Color("primary") : Color("background2"))
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .stroke(Color("primary"), lineWidth: 1)
             )
         }

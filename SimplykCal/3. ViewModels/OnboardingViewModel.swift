@@ -28,6 +28,7 @@ class OnboardingViewModel{
     var gender: Gender? = nil
     var activity: ActivityLevel? = nil
     var goal: Goal? = nil
+    //TODO: when ready delete the Restriction functionality
     var restrictions: [Restriction] = []
     var bmr: Double = 0
     var tdee: Double = 0
@@ -35,6 +36,12 @@ class OnboardingViewModel{
     var expectedEndDate: Date = Date.now
     var carbFatBalance: CarbFatBalance? = nil
     var proteinIntake: ProteinIntake = .moderate
+    var macroSplit: MacroSplit? = nil
+    
+    // constants
+    private let caloriesPerGramProtein: Double = 4
+    private let caloriesPerGramCarbs: Double = 4
+    private let caloresPerGramFat: Double = 9
     
     var weeklyWeight: Double = 0.0
     var weeklyPercentage: Double = 0.5 {
@@ -62,6 +69,7 @@ class OnboardingViewModel{
             self.weight = 67
             self.targetWeight = 67
             self.macros = Macros(calories: 200, protein: 150, fats: 100, carbs: 100)
+            self.macroSplit = MacroSplit(protein: 0.5, fat: 0.3, carbs: 0.2)
             self.height = 174
             self.birthday = Calendar.current.date(from: DateComponents(year: 2000, month: 6, day: 22))!
         }
@@ -244,9 +252,33 @@ extension OnboardingViewModel{
         }
     }
     
-    func calculateMacroDistribution(){
-        // TODO: complete this function
+    func calculateMacroDistribution() {
+        switch (carbFatBalance, proteinIntake) {
+            
+        case (.balanced, .low):        self.macroSplit = MacroSplit(protein: 0.20, fat: 0.30, carbs: 0.50)
+        case (.balanced, .moderate):   self.macroSplit = MacroSplit(protein: 0.25, fat: 0.30, carbs: 0.45)
+        case (.balanced, .high):       self.macroSplit = MacroSplit(protein: 0.30, fat: 0.25, carbs: 0.45)
+        case (.balanced, .extraHigh):  self.macroSplit = MacroSplit(protein: 0.35, fat: 0.25, carbs: 0.40)
+            
+        case (.lowFat, .low):          self.macroSplit = MacroSplit(protein: 0.20, fat: 0.20, carbs: 0.60)
+        case (.lowFat, .moderate):     self.macroSplit = MacroSplit(protein: 0.25, fat: 0.20, carbs: 0.55)
+        case (.lowFat, .high):         self.macroSplit = MacroSplit(protein: 0.30, fat: 0.20, carbs: 0.50)
+        case (.lowFat, .extraHigh):    self.macroSplit = MacroSplit(protein: 0.35, fat: 0.20, carbs: 0.45)
+            
+        case (.lowCarb, .low):         self.macroSplit = MacroSplit(protein: 0.20, fat: 0.40, carbs: 0.40)
+        case (.lowCarb, .moderate):    self.macroSplit = MacroSplit(protein: 0.25, fat: 0.40, carbs: 0.35)
+        case (.lowCarb, .high):        self.macroSplit = MacroSplit(protein: 0.30, fat: 0.40, carbs: 0.30)
+        case (.lowCarb, .extraHigh):   self.macroSplit = MacroSplit(protein: 0.35, fat: 0.40, carbs: 0.25)
+            
+        case (.keto, .low):            self.macroSplit = MacroSplit(protein: 0.15, fat: 0.75, carbs: 0.10)
+        case (.keto, .moderate):       self.macroSplit = MacroSplit(protein: 0.20, fat: 0.70, carbs: 0.10)
+        case (.keto, .high):           self.macroSplit = MacroSplit(protein: 0.25, fat: 0.65, carbs: 0.10)
+        case (.keto, .extraHigh):      self.macroSplit = MacroSplit(protein: 0.30, fat: 0.60, carbs: 0.10)
+        case (.none, _):
+            self.macroSplit = MacroSplit(protein: 0.25, fat: 0.30, carbs: 0.45)
+        }
     }
+
 }
 
 // Validation

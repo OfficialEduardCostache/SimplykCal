@@ -79,11 +79,13 @@ struct GoalSummaryScreen: View {
                                     .font(.system(size: 12, weight: .semibold, design: .monospaced))
                                     .foregroundStyle(Color("text1"))
                                 
-                                Text(String(format: "%.0f", viewModel.macros.protein))
+                                Text(String(format: "%.0fg", viewModel.macros.protein))
                                     .font(.system(size: 12, weight: .semibold, design: .monospaced))
                                     .foregroundStyle(Color("text1"))
                                 
-                                //TODO: Add percentage annotations here
+                                Text(String(format: "%.0f%%", (viewModel.macroSplit?.protein ?? 0) * 100))
+                                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                                    .foregroundStyle(Color("text1"))
                             }
                             .padding(.leading)
                             
@@ -99,11 +101,13 @@ struct GoalSummaryScreen: View {
                                     .font(.system(size: 12, weight: .semibold, design: .monospaced))
                                     .foregroundStyle(Color("text1"))
                                 
-                                Text(String(format: "%.0f", viewModel.macros.fats))
+                                Text(String(format: "%.0fg", viewModel.macros.fats))
                                     .font(.system(size: 12, weight: .semibold, design: .monospaced))
                                     .foregroundStyle(Color("text1"))
                                 
-                                //TODO: Add percentage annotations here
+                                Text(String(format: "%.0f%%", (viewModel.macroSplit?.fat ?? 0) * 100))
+                                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                                    .foregroundStyle(Color("text1"))
                             }
                             
                             Spacer()
@@ -118,11 +122,13 @@ struct GoalSummaryScreen: View {
                                     .font(.system(size: 12, weight: .semibold, design: .monospaced))
                                     .foregroundStyle(Color("text1"))
                                 
-                                Text(String(format: "%.0f", viewModel.macros.carbs))
+                                Text(String(format: "%.0fg", viewModel.macros.carbs))
                                     .font(.system(size: 12, weight: .semibold, design: .monospaced))
                                     .foregroundStyle(Color("text1"))
                                 
-                                //TODO: Add percentage annotations here
+                                Text(String(format: "%.0f%%", (viewModel.macroSplit?.carbs ?? 0) * 100))
+                                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                                    .foregroundStyle(Color("text1"))
                             }
                             .padding(.trailing)
                         }

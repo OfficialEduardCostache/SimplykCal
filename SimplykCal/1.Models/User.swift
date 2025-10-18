@@ -33,12 +33,14 @@ class User{
         set { goalRaw = newValue.rawValue }
     }
     
+    //TODO: when ready delete the Restriction functionality
     private var restrictionsRaw: [String]
     var restrictions: [Restriction] {
         get { restrictionsRaw.compactMap(Restriction.init(rawValue:)) }
         set { restrictionsRaw = newValue.map(\.rawValue) }
     }
     
+    //TODO: when ready delete the Restriction functionality
     init(name: String, birthday: Date, height: Double, weight: Double, gender: Gender, activity: ActivityLevel, goal: Goal, restrictions: [Restriction]) {
         self.name = name
         self.birthday = birthday
@@ -63,6 +65,7 @@ enum Goal: String{
     case gain = "Gain"
 }
 
+//TODO: when ready delete the Restriction functionality
 enum Restriction: String{
     case vegan = "Vegan"
     case vegetarian = "Vegetarian"
@@ -104,4 +107,10 @@ struct Macros{
     var protein: Double
     var fats: Double
     var carbs: Double
+}
+
+struct MacroSplit {
+    let protein: Double
+    let fat: Double
+    let carbs: Double
 }
