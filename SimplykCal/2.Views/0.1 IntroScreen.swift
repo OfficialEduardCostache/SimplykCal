@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct IntroScreen: View {
     @Binding var viewModel: OnboardingViewModel
@@ -42,7 +43,6 @@ struct IntroScreen: View {
                 viewModel.next()
             })
             .padding()
-            .padding(.bottom, 40)
         }
     }
 }

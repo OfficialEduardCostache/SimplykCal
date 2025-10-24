@@ -80,7 +80,4 @@ private struct BackButtonLabel: View {
 
 #Preview{
     OnboardingView()
-    
-//    GoalScreen(screenStep: .constant(1))
-//        .background(Color("background"))
 }

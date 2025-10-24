@@ -204,7 +204,6 @@ struct ExtendedGoalScreen: View {
                     viewModel.next()
                 })
                 .padding()
-                .padding(.bottom, 40)
             }
         }
         else{

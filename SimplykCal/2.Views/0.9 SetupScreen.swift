@@ -9,10 +9,8 @@ import SwiftUI
 import SwiftData
 
 struct SetupScreen: View {
-    @Environment(\.modelContext) var modelContext
+    @Environment(\.modelContext) private var context
     @Binding var viewModel: OnboardingViewModel
-    
-    @Query private var users: [User]
 
     var body: some View {
         VStack {
@@ -42,11 +40,9 @@ struct SetupScreen: View {
         .safeAreaInset(edge: .bottom) {
             SKActionButton(title: "Let's get started!", fillColour: Color("primary"), action: {
                 viewModel.triggerSucessfulHaptic.toggle()
-                let newUser = viewModel.generateNewUser()
-                modelContext.insert(newUser)
+                context.insert(viewModel.generateNewUser())
             })
             .padding()
-            .padding(.bottom, 40)
         }
     }
 }

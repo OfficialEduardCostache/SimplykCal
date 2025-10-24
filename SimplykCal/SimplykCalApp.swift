@@ -13,7 +13,6 @@ struct SimplykCalApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
-                .ignoresSafeArea(edges: .bottom)
         }
         .modelContainer(for: [User.self])
     }

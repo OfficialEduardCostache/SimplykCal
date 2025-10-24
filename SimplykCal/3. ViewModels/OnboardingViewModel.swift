@@ -22,14 +22,10 @@ class OnboardingViewModel{
     var name: String = ""
     var birthday: Date = Calendar.current.date(from: DateComponents(year: 2000, month: 6, day: 22))!
     var height: Double = 177
-    let heightRange: ClosedRange<Double> = 130...210
     var weight: Double = 70
-    let weightRange: ClosedRange<Double> = 35...220
     var gender: Gender? = nil
     var activity: ActivityLevel? = nil
     var goal: Goal? = nil
-    //TODO: when ready delete the Restriction functionality
-    var restrictions: [Restriction] = []
     var bmr: Double = 0
     var tdee: Double = 0
     var macros: Macros = Macros(calories: 0, protein: 0, fats: 0, carbs: 0)
@@ -39,6 +35,8 @@ class OnboardingViewModel{
     var macroSplit: MacroSplit? = nil
     
     // constants
+    let heightRange: ClosedRange<Double> = 130...210
+    let weightRange: ClosedRange<Double> = 35...220
     private let caloriesPerGramProtein: Double = 4
     private let caloriesPerGramCarbs: Double = 4
     private let caloriesPerGramFat: Double = 9
@@ -116,26 +114,24 @@ class OnboardingViewModel{
         print("screen step 7")
         return screenStep == 7
     }
-  
-    func handleRestrictionSelection(restriction: Restriction) {
-        if let index = restrictions.firstIndex(of: restriction){
-            restrictions.remove(at: index)
-        }
-        else{
-            restrictions.append(restriction)
-        }
-    }
-    
+
     func generateNewUser() -> User{
+
         let newUser = User(
-            name: name,
-            birthday: birthday,
-            height: height,
-            weight: weight,
-            gender: gender ?? .male,
-            activity: activity ?? .sedentary,
-            goal: goal ?? .lose,
-            restrictions: restrictions)
+            name: self.name,
+            birthday: self.birthday,
+            height: self.height,
+            weight: self.weight,
+            gender: self.gender!,
+            activity: self.activity!,
+            goal: self.goal!,
+            bmr: self.bmr,
+            tdee: self.tdee,
+            macros: self.macros,
+            macroSplit: self.macroSplit!,
+            expectedEndDate: self.expectedEndDate,
+            carbFatBalance: self.carbFatBalance!,
+            proteinIntake: self.proteinIntake)
         
         return newUser
     }

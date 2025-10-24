@@ -79,7 +79,6 @@ struct GoalScreen: View {
                 }
             })
             .padding()
-            .padding(.bottom, 40)
         }
     }
 }

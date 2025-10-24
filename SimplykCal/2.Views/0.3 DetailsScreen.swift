@@ -117,7 +117,6 @@ struct DetailsScreen: View {
                 viewModel.calculateBMR()
             })
             .padding()
-            .padding(.bottom, 40)
         }
         .sheet(isPresented: $showBirthdayPicker, onDismiss: {
             showBirthdayPicker = false

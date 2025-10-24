@@ -1,115 +1,125 @@
-//
-//  UserModel.swift
-//  SimplykCal
-//
-//  Created by Eduard Costache on 30/09/2025.
-//
-
 import SwiftData
 import Foundation
 
 @Model
-class User{
+final class User {
+    // Simple scalars
     var name: String
     var birthday: Date
     var height: Double
     var weight: Double
-    
+    var bmr: Double
+    var tdee: Double
+    var expectedEndDate: Date
+
+    // Enums persisted as raw strings
     private var genderRaw: String
     var gender: Gender {
         get { Gender(rawValue: genderRaw) ?? .male }
         set { genderRaw = newValue.rawValue }
     }
-    
+
     private var activityRaw: String
-    var activity: ActivityLevel{
+    var activity: ActivityLevel {
         get { ActivityLevel(rawValue: activityRaw) ?? .sedentary }
         set { activityRaw = newValue.rawValue }
     }
-    
+
     private var goalRaw: String
     var goal: Goal {
         get { Goal(rawValue: goalRaw) ?? .maintain }
         set { goalRaw = newValue.rawValue }
     }
-    
-    //TODO: when ready delete the Restriction functionality
-    private var restrictionsRaw: [String]
-    var restrictions: [Restriction] {
-        get { restrictionsRaw.compactMap(Restriction.init(rawValue:)) }
-        set { restrictionsRaw = newValue.map(\.rawValue) }
+
+    private var carbFatBalanceRaw: String
+    var carbFatBalance: CarbFatBalance {
+        get { CarbFatBalance(rawValue: carbFatBalanceRaw) ?? .balanced }
+        set { carbFatBalanceRaw = newValue.rawValue }
+    }
+
+    private var proteinIntakeRaw: String
+    var proteinIntake: ProteinIntake {
+        get { ProteinIntake(rawValue: proteinIntakeRaw) ?? .moderate }
+        set { proteinIntakeRaw = newValue.rawValue }
     }
     
-    //TODO: when ready delete the Restriction functionality
-    init(name: String, birthday: Date, height: Double, weight: Double, gender: Gender, activity: ActivityLevel, goal: Goal, restrictions: [Restriction]) {
+    var macros: Macros
+    var macroSplit: MacroSplit
+
+    // Designated init (take enums, store raws)
+    init(
+        name: String,
+        birthday: Date,
+        height: Double,
+        weight: Double,
+        gender: Gender,
+        activity: ActivityLevel,
+        goal: Goal,
+        bmr: Double,
+        tdee: Double,
+        macros: Macros,
+        macroSplit: MacroSplit,
+        expectedEndDate: Date,
+        carbFatBalance: CarbFatBalance,
+        proteinIntake: ProteinIntake
+    ) {
         self.name = name
         self.birthday = birthday
         self.height = height
         self.weight = weight
+        self.bmr = bmr
+        self.tdee = tdee
+        self.macros = macros
+        self.macroSplit = macroSplit
+        self.expectedEndDate = expectedEndDate
+
         self.genderRaw = gender.rawValue
         self.activityRaw = activity.rawValue
         self.goalRaw = goal.rawValue
-        self.restrictionsRaw = restrictions.map(\.rawValue)
+        self.carbFatBalanceRaw = carbFatBalance.rawValue
+        self.proteinIntakeRaw = proteinIntake.rawValue
     }
 }
 
-
-enum Gender: String{
-    case male = "Male"
-    case female = "Female"
+enum Gender: String {
+    case male = "Male",
+         female = "Female"
 }
 
-enum Goal: String{
-    case lose = "Lose"
-    case maintain = "Maintain"
-    case gain = "Gain"
+enum Goal: String {
+    case lose = "Lose", maintain = "Maintain", gain = "Gain"
 }
 
-//TODO: when ready delete the Restriction functionality
-enum Restriction: String{
-    case vegan = "Vegan"
-    case vegetarian = "Vegetarian"
-    case pescatarian = "Pescatarian"
-    case keto = "Keto"
-    case glutenFree = "Gluten-Free"
-    case dairyFree = "Dairy-Free"
-    case nutFree = "Nut-Free"
-    case peanutFree = "Peanut-Free"
-    case eggFree = "Egg-Free"
-    case soyFree = "Soy-Free"
+enum ActivityLevel: String {
+    case sedentary = "Sedentary", 
+         light = "Light",
+         moderate = "Moderate",
+         veryActive = "Heavy",
+         extremelyActive = "Extreme"
 }
 
-
-enum ActivityLevel: String{
-    case sedentary = "Sedentary"
-    case light = "Light"
-    case moderate = "Moderate"
-    case veryActive = "Heavy"
-    case extremelyActive = "Extreme"
+enum CarbFatBalance: String {
+    case balanced = "Balanced",
+         lowCarb = "Low Carb",
+         lowFat = "Low Fat",
+         keto = "Keto"
 }
 
-enum CarbFatBalance: String{
-    case balanced = "Balanced"
-    case lowCarb = "Low Carb"
-    case lowFat = "Low Fat"
-    case keto = "Keto"
+enum ProteinIntake: String {
+    case low = "Low Protein",
+         moderate = "Moderate Protein",
+         high = "High Protein",
+         extraHigh = "Extra High Protein"
 }
 
-enum ProteinIntake: String{
-    case low = "Low Protein"
-    case moderate = "Moderate Protein"
-    case high = "High Protein"
-    case extraHigh = "Extra High Protein"
-}
-
-struct Macros{
+struct Macros: Codable {
     var calories: Double
     var protein: Double
     var fats: Double
     var carbs: Double
 }
 
-struct MacroSplit {
+struct MacroSplit: Codable {
     let protein: Double
     let fat: Double
     let carbs: Double

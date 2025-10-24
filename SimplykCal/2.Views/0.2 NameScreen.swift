@@ -43,7 +43,6 @@ struct NameScreen: View {
                 viewModel.next()
             })
             .padding()
-            .padding(.bottom, 40)
         }
     }
 }

@@ -99,7 +99,6 @@ struct ActivityLevelScreen: View{
                 viewModel.calculateNewCalories()
             })
             .padding()
-            .padding(.bottom, 40)
         }
     }
 }

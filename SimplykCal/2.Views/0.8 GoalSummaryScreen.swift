@@ -193,7 +193,6 @@ struct GoalSummaryScreen: View {
                 viewModel.next()
             })
             .padding()
-            .padding(.bottom, 40)
         }
     }
 }
