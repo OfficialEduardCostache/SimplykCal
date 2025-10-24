@@ -15,7 +15,6 @@ struct RootView: View {
     @Query var users: [User]
     
     var body: some View {
-        
 //        if let user = users.first{
 //            ZStack {
 //                switch tabBarViewModel.selectedTab {
@@ -45,11 +44,6 @@ struct RootView: View {
 //        }
 
         OnboardingView()
-
-//        ZStack {
-//            Color("background").ignoresSafeArea()
-//            ExtendedGoalScreen(viewModel: $previewVM)
-//        }
     }
 }
 

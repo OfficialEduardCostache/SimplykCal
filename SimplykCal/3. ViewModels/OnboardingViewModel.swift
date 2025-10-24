@@ -41,7 +41,7 @@ class OnboardingViewModel{
     // constants
     private let caloriesPerGramProtein: Double = 4
     private let caloriesPerGramCarbs: Double = 4
-    private let caloresPerGramFat: Double = 9
+    private let caloriesPerGramFat: Double = 9
     
     var weeklyWeight: Double = 0.0
     var weeklyPercentage: Double = 0.5 {
@@ -277,8 +277,21 @@ extension OnboardingViewModel{
         case (.none, _):
             self.macroSplit = MacroSplit(protein: 0.25, fat: 0.30, carbs: 0.45)
         }
+        
+        calculateAndUpdateMacros()
     }
-
+    
+    func calculateAndUpdateMacros() {
+        if let macroSplit = self.macroSplit{
+            let proteinP = macroSplit.protein
+            let fatP = macroSplit.fat
+            let carbsP = macroSplit.carbs
+            
+            self.macros.protein = (self.macros.calories * proteinP) / caloriesPerGramProtein
+            self.macros.fats = (self.macros.calories * fatP) / caloriesPerGramFat
+            self.macros.carbs = (self.macros.calories * carbsP) / caloriesPerGramCarbs
+        }
+    }
 }
 
 // Validation

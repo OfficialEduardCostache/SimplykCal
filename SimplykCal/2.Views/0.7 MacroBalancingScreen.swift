@@ -119,9 +119,16 @@ struct MacroBalancingScreen: View {
                                 .font(.system(size: 14, weight: .regular, design: .monospaced))
                                 .foregroundStyle(Color("text1"))
                             
-                            Text("99%")
-                                .font(.system(size: 14, weight: .bold, design: .monospaced))
-                                .foregroundStyle(Color("text1"))
+                            if let protein = viewModel.macroSplit?.protein{
+                                Text(String(format: "%.0f%%", (protein) * 100))
+                                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                                    .foregroundStyle(Color("text1"))
+                            }
+                            else{
+                                Text("-%")
+                                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                                    .foregroundStyle(Color("text1"))
+                            }
                         }
                         .padding(.leading)
                         Spacer()
@@ -135,9 +142,16 @@ struct MacroBalancingScreen: View {
                                 .font(.system(size: 14, weight: .regular, design: .monospaced))
                                 .foregroundStyle(Color("text1"))
                             
-                            Text("99%")
-                                .font(.system(size: 14, weight: .bold, design: .monospaced))
-                                .foregroundStyle(Color("text1"))
+                            if let fat = viewModel.macroSplit?.fat{
+                                Text(String(format: "%.0f%%", (fat) * 100))
+                                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                                    .foregroundStyle(Color("text1"))
+                            }
+                            else{
+                                Text("-%")
+                                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                                    .foregroundStyle(Color("text1"))
+                            }
                         }
                         Spacer()
                         VStack{
@@ -150,9 +164,16 @@ struct MacroBalancingScreen: View {
                                 .font(.system(size: 14, weight: .regular, design: .monospaced))
                                 .foregroundStyle(Color("text1"))
                             
-                            Text("99%")
-                                .font(.system(size: 14, weight: .bold, design: .monospaced))
-                                .foregroundStyle(Color("text1"))
+                            if let carbs = viewModel.macroSplit?.carbs{
+                                Text(String(format: "%.0f%%", (carbs) * 100))
+                                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                                    .foregroundStyle(Color("text1"))
+                            }
+                            else{
+                                Text("-%")
+                                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                                    .foregroundStyle(Color("text1"))
+                            }
                         }
                         .padding(.trailing)
                     }
