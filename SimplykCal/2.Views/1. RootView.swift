@@ -32,7 +32,7 @@ struct RootView: View {
             .sheet(isPresented: $tabBarViewModel.showAddFoodSheet, onDismiss: {
                 tabBarViewModel.showAddFoodSheet = false
             }) {
-                FoodSheet()
+                FoodSheet(showAddFoodSheet: $tabBarViewModel.showAddFoodSheet)
                     .presentationDetents([.fraction(0.95)])
                     .presentationDragIndicator(.visible)
             }

@@ -17,6 +17,8 @@ enum TabSelection{
 struct FoodSheet: View {
     @State var selectedTab: TabSelection = .scan
     @State var showFoodDetailsSheet = false
+    
+    @Binding var showAddFoodSheet: Bool
 
     var body: some View {
         VStack {
@@ -30,7 +32,7 @@ struct FoodSheet: View {
                 case .search:
                     SearchScreen(showFoodDetailsSheet: $showFoodDetailsSheet)
                 case .quickAdd:
-                    QuickAddScreen()
+                    QuickAddScreen(showAddFoodSheet: $showAddFoodSheet)
                 case .recipes:
                     RecipesScreen(showFoodDetailsSheet: $showFoodDetailsSheet)
                 }
@@ -132,5 +134,5 @@ private struct TabSegment: View {
 }
 
 #Preview {
-    FoodSheet()
+    FoodSheet(showAddFoodSheet: .constant(false))
 }

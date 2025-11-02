@@ -115,7 +115,7 @@ private struct FoodHistoryStack: View {
             if foods.count > 1{
                 ScrollView(.vertical) {
                     LazyVStack(spacing: 8) {
-                        ForEach(foods, id: \.self) { food in
+                        ForEach(foods, id: \.persistentModelID) { food in
                             FoodItemCard(foodName: food.name, calories: food.calories, protein: food.protein, fats: food.fats, carbs: food.carbs, dateAdded: food.dateAdded, icon: HomeViewModelUtil.iconImages.randomElement()!, showTime: true, showAddIcon: false)
                         }
                     }
@@ -155,7 +155,7 @@ struct ExpandedFoodHistorySheet: View{
         VStack(alignment: .leading, spacing: 8) {
             ScrollView(.vertical) {
                 LazyVStack(spacing: 8) {
-                    ForEach(foods, id: \.self) { food in
+                    ForEach(foods, id: \.persistentModelID) { food in
                         FoodItemCard(foodName: food.name, calories: food.calories, protein: food.protein, fats: food.fats, carbs: food.carbs, dateAdded: food.dateAdded, icon: HomeViewModelUtil.iconImages.randomElement()!, showTime: true, showAddIcon: false)
                     }
                 }

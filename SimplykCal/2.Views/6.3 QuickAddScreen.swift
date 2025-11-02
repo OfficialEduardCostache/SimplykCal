@@ -9,18 +9,28 @@ import SwiftUI
 
 struct QuickAddScreen: View {
     @Environment(\.modelContext) private var context
+    @Binding var showAddFoodSheet: Bool
     
-    @State var calories: String = ""
-    @State var protein: String = ""
-    @State var fat: String = ""
-    @State var carbs: String = ""
-    @State var name: String = ""
+    @State private var calories: String = ""
+    @State private var protein: String = ""
+    @State private var fat: String = ""
+    @State private var carbs: String = ""
+    @State private var name: String = ""
+    
+    @State private var isError: Bool = false
+    @State private var errorMessage: String = ""
     
     var body: some View {
         VStack{
-            SKTextField(title: "Energy", text: $calories, trailingText: "kCal")
-                .padding(.vertical, 20)
-                .keyboardType(.decimalPad)
+            VStack(spacing: 12) {
+                SKTextField(title: "Energy", text: $calories, trailingText: "kCal")
+                    .keyboardType(.decimalPad)
+                    .onChange(of: calories) { oldValue, newValue in
+                        validateDigitsAndSeparator(value: $calories, oldValue: oldValue, newValue: newValue)
+                    }
+            }
+            .padding()
+            
             
             HStack{
                 SKTextField(title: "Protein", text: $protein, trailingText: "g")
@@ -30,24 +40,121 @@ struct QuickAddScreen: View {
                 SKTextField(title: "Carbs", text: $carbs, trailingText: "g")
                     .keyboardType(.decimalPad)
             }
-            .padding(.bottom, 20)
+            .padding()
             
             SKTextField(title: "Name", text: $name)
+                .padding()
             
             Spacer()
             
-            SKActionButton(title: "Add", fillColour: Color("primary"), action: {
-                let newFood = Food(name: name, calories: Double(calories) ?? 0, protein: Double(protein) ?? 0, fats: Double(fat) ?? 0, carbs: Double(carbs) ?? 0, dateAdded: Date.now)
+            SKActionButton(title: "Add", fillColour: Color("primary"), isDisabled: calories.isEmpty, action: {
                 
+                // validating the macros
+                guard let newCalories = parseStringMacroToDouble(macro: calories) else{
+                    isError = true
+                    errorMessage = "Please input a valid calorie amount"
+                    return
+                }
+                
+                guard let newProtein = parseStringMacroToDouble(macro: protein) else{
+                    isError = true
+                    errorMessage = "Please input a valid protein amount"
+                    return
+                }
+                
+                guard let newFat = parseStringMacroToDouble(macro: fat) else{
+                    isError = true
+                    errorMessage = "Please input a valid fat amount"
+                    return
+                }
+                
+                guard let newCarbs = parseStringMacroToDouble(macro: carbs) else{
+                    isError = true
+                    errorMessage = "Please input a valid carbs amount"
+                    return
+                }
+                
+                var newName = ""
+                
+                // validating the name
+                if name.isEmpty{
+                    newName = "Quick Add"
+                }
+                else{
+                    newName = name
+                }
+                
+                // adding the food
+                let newFood = Food(name: newName, calories: newCalories, protein: newProtein, fats: newFat, carbs: newCarbs, dateAdded: Date.now)
                 context.insert(newFood)
+                
+                // closing the screen
+                showAddFoodSheet = false
             })
+            .padding()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding()
+        .alert("Input Error", isPresented: $isError) {
+            Button("Okay") {
+                isError = false
+            }
+        } message: {
+            Text(errorMessage)
+        }
+
+    }
+}
+
+//MARK: Logic
+extension QuickAddScreen{
+    private func parseStringMacroToDouble(macro: String) -> Double?{
+        if macro.isEmpty{
+            return 0.0
+        }
+        
+        guard let value = Double(macro) else{
+            return nil
+        }
+        
+        return value
+    }
+    
+    private func validateDigitsAndSeparator(value: Binding<String>, oldValue: String, newValue: String){
+        let sep: Character = "."
+        var sepCount = 0
+        var digitsBeforeSep = 0
+        var digitsAfterSep = -1
+        
+        for c in newValue{
+            if c == sep{
+                sepCount += 1
+            }
+            
+            if sepCount == 1{
+                digitsAfterSep += 1
+            }
+            else if sepCount > 1{
+                value.wrappedValue = oldValue
+                break
+            }
+            else{
+                digitsBeforeSep += 1
+            }
+        }
+        
+        if digitsBeforeSep > 5{
+            value.wrappedValue = oldValue
+            return
+        }
+        
+        if digitsAfterSep > 2{
+            value.wrappedValue = oldValue
+            return
+        }
     }
 }
 
 #Preview{
-    QuickAddScreen()
+    QuickAddScreen(showAddFoodSheet: .constant(false))
         .background(Color("background"))
 }
