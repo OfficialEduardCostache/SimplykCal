@@ -27,3 +27,6 @@ playground.xcworkspace
 *.ipa
 *.dSYM.zip
 *.crash
+
+#Read me
+*README.md
