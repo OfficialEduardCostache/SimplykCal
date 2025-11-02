@@ -29,7 +29,7 @@ struct SKProgressBar: View {
     var rawProgress: Double
     var goal: Double
     let progressBarSize: ProgressBarSize
-    let progressType: ProgressType
+    let progressType: MacroType
     var futureIncrement: Double?
 
     

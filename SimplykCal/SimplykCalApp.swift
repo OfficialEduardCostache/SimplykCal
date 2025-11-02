@@ -14,6 +14,6 @@ struct SimplykCalApp: App {
         WindowGroup {
             RootView()
         }
-        .modelContainer(for: [User.self])
+        .modelContainer(for: [User.self, Food.self])
     }
 }

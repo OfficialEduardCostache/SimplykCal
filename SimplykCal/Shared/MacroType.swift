@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum ProgressType {
+enum MacroType {
     case calories, protein, carbs, fat
     
     var angularGradient: AngularGradient {

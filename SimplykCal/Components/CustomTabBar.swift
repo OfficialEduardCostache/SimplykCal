@@ -25,7 +25,6 @@ struct CustomTabBar: View {
             FloatingActionButton(systemName: "plus") {
                 tabBarViewModel.showAddFoodSheet = true
             }
-//            .offset(y:-38)
             
             Spacer()
             RegularIcon(image: Image(systemName: "chart.xyaxis.line"), isSelected: tabBarViewModel.selectedTab == 2) {
@@ -37,7 +36,6 @@ struct CustomTabBar: View {
             }
             Spacer()
         }
-        .padding(.bottom, 40)
         .padding(4)
         .background(
             Color("background2")

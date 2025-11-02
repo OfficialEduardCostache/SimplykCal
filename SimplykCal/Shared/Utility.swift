@@ -35,8 +35,15 @@ extension Color {
     }
 }
 
-/// Utility that builds an array of “first‐of‐month” Date objects,
-/// and can compute daysInMonth / firstWeekday (Monday = 1).
+struct DateFormattingUtil{
+    static func formattedTime(from date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        formatter.locale = Locale.current // respects user 12/24h preference
+        return formatter.string(from: date)
+    }
+}
+
 struct DateUtility {
     let year: Int
 

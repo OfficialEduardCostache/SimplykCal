@@ -6,22 +6,23 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct HomeView: View {
     @Bindable var tabBarViewModel: TabBarViewModel
-    
-    @State var showFoodHistoryExpandedSheet: Bool = false
+    @State var homeViewModel: HomeViewModel
     
     var body: some View {
         ZStack{
             VStack {
-                ProgressBarStack()
-                FoodHistoryStack(showFoodHistoryExpandedSheet: $showFoodHistoryExpandedSheet)
+                ProgressBarStack(homeViewModel: $homeViewModel)
+                FoodHistoryStack(homeViewModel: $homeViewModel)
                     .padding(.horizontal, 4)
                 Spacer()
             }
-            .sheet(isPresented: $showFoodHistoryExpandedSheet) {
-                ExpandedFoodHistorySheet()
+            .sheet(isPresented: $homeViewModel.showFoodHistoryExpandedSheet) {
+                ExpandedFoodHistorySheet(homeViewModel: $homeViewModel)
+                    .presentationDetents([.fraction(0.8)])
             }
         }
         .background(Color("background").ignoresSafeArea(edges: .all))
@@ -29,11 +30,12 @@ struct HomeView: View {
 }
 
 private struct ProgressBarStack: View {
+    @Binding var homeViewModel: HomeViewModel
     var body: some View {
         VStack{
             HStack {
                 VStack{
-                    Text("100")
+                    Text(String(format: "%.0f", homeViewModel.getRemainingCalories()))
                         .font(.system(size: 16, weight: .bold, design: .monospaced))
                         .foregroundStyle(Color("text1"))
                     
@@ -44,11 +46,11 @@ private struct ProgressBarStack: View {
                 .frame(width: 90)
                 
                 // CALORIES PROGRESS BAR
-                SKProgressBar(rawProgress: 100, goal: 1000, progressBarSize: .big, progressType: .calories)
+                SKProgressBar(rawProgress: homeViewModel.getConsumedMacro(macroType: .calories), goal: homeViewModel.getMacroTarget(macroType: .calories), progressBarSize: .big, progressType: .calories)
                     .padding(.horizontal)
                 
                 VStack{
-                    Text("1400")
+                    Text(String(format: "%.0f", homeViewModel.getMacroTarget(macroType: .calories)))
                         .font(.system(size: 16, weight: .bold, design: .monospaced))
                         .foregroundStyle(Color("text1"))
                     
@@ -63,17 +65,17 @@ private struct ProgressBarStack: View {
             
             HStack{
                 // PROTEIN PROGRESS BAR
-                SKProgressBar(rawProgress: 100, goal: 150, progressBarSize: .medium, progressType: .protein)
+                SKProgressBar(rawProgress: homeViewModel.getConsumedMacro(macroType: .protein), goal: homeViewModel.getMacroTarget(macroType: .protein), progressBarSize: .medium, progressType: .protein)
                 
                 Spacer()
                 
                 // FAT PROGRESS BAR
-                SKProgressBar(rawProgress: 50, goal: 110, progressBarSize: .medium, progressType: .fat)
+                SKProgressBar(rawProgress: homeViewModel.getConsumedMacro(macroType: .fat), goal: homeViewModel.getMacroTarget(macroType: .fat), progressBarSize: .medium, progressType: .fat)
                 
                 Spacer()
                 
                 // CARBS PROGRESS BAR
-                SKProgressBar(rawProgress: 2, goal: 30, progressBarSize: .medium, progressType: .carbs)
+                SKProgressBar(rawProgress: homeViewModel.getConsumedMacro(macroType: .carbs), goal: homeViewModel.getMacroTarget(macroType: .carbs), progressBarSize: .medium, progressType: .carbs)
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 20)
@@ -83,7 +85,8 @@ private struct ProgressBarStack: View {
 }
 
 private struct FoodHistoryStack: View {
-    @Binding var showFoodHistoryExpandedSheet: Bool
+    @Binding var homeViewModel: HomeViewModel
+    @Query private var foods: [Food]
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -95,29 +98,46 @@ private struct FoodHistoryStack: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 4)
                 
-                Button {
-                    // scale up the food history
-                    showFoodHistoryExpandedSheet = true
-                } label: {
-                    Image(systemName: "arrow.up.left.and.arrow.down.right")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 16, height: 16)
-                        .padding(.trailing)
-                        .foregroundStyle(Color("text2"))
-                }
-            }
-
-            ScrollView(.vertical) {
-                LazyVStack(spacing: 8) {
-                    ForEach(0..<50, id: \.self) { _ in
-                        FoodHistoryCard()
+                if foods.count > 1{
+                    Button {
+                        homeViewModel.triggerFoodHistoryExpandedSheet()
+                    } label: {
+                        Image(systemName: "arrow.up.left.and.arrow.down.right")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 16, height: 16)
+                            .padding(.trailing)
+                            .foregroundStyle(Color("text2"))
                     }
                 }
-                .padding(.vertical, 8)
             }
-            .scrollIndicators(.hidden)
-            .clipShape(Rectangle())
+            
+            if foods.count > 1{
+                ScrollView(.vertical) {
+                    LazyVStack(spacing: 8) {
+                        ForEach(foods, id: \.self) { food in
+                            FoodItemCard(foodName: food.name, calories: food.calories, protein: food.protein, fats: food.fats, carbs: food.carbs, dateAdded: food.dateAdded, icon: HomeViewModelUtil.iconImages.randomElement()!, showTime: true, showAddIcon: false)
+                        }
+                    }
+                    .padding(.vertical, 8)
+                }
+                .scrollIndicators(.hidden)
+                .clipShape(Rectangle())
+            }
+            else{
+                VStack{
+                    Image("mascot-searching")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 150, height: 150)
+                    
+                    Text("No food today")
+                        .font(.system(size: 18, weight: .semibold, design: .monospaced))
+                        .foregroundStyle(Color("text2"))
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity,alignment: .center)
+            }
+            
         }
         .background(
             RoundedRectangle(cornerRadius: 12)
@@ -127,8 +147,32 @@ private struct FoodHistoryStack: View {
     }
 }
 
+struct ExpandedFoodHistorySheet: View{
+    @Binding var homeViewModel: HomeViewModel
+    @Query private var foods: [Food]
+    
+    var body: some View{
+        VStack(alignment: .leading, spacing: 8) {
+            ScrollView(.vertical) {
+                LazyVStack(spacing: 8) {
+                    ForEach(foods, id: \.self) { food in
+                        FoodItemCard(foodName: food.name, calories: food.calories, protein: food.protein, fats: food.fats, carbs: food.carbs, dateAdded: food.dateAdded, icon: HomeViewModelUtil.iconImages.randomElement()!, showTime: true, showAddIcon: false)
+                    }
+                }
+                .padding(.vertical, 8)
+            }
+            .scrollIndicators(.hidden)
+            .clipShape(Rectangle())
+        }
+        .background(
+            Color("background2").ignoresSafeArea(.all)
+        )
+    }
+}
+
 #Preview {
     @Previewable var tabBarViewModel = TabBarViewModel()
+    @Previewable var previewVM: HomeViewModel = HomeViewModel(mockData: true, user: nil)
     
-    HomeView(tabBarViewModel: tabBarViewModel)
+    HomeView(tabBarViewModel: tabBarViewModel, homeViewModel: previewVM)
 }

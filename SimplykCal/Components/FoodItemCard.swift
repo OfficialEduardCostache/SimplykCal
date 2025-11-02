@@ -8,84 +8,85 @@
 import SwiftUI
 
 struct FoodItemCard: View {
-    let dummyFoodName: String = "Banana"
-    let dummyCalories: Double = 105
-    let dummyCarbs: Double = 27
-    let dummyProtein: Double = 1.4
-    let dummyFat: Double = 0.4
+    let foodName: String
+    let calories: Double
+    let protein: Double
+    let fats: Double
+    let carbs: Double
     
-    let iconImages: [Image] =
-    [
-        Image("dairy"),
-        Image("eggs"),
-        Image("fruits"),
-        Image("grains"),
-        Image("nuts"),
-        Image("plate-and-cutlery"),
-        Image("seeds"),
-        Image("vegetables"),
-        Image("chicken"),
-        Image("beef"),
-        Image("pork"),
-        Image("fish"),
-        Image("shrimp"),
-        Image("legumes"),
-        Image("bakery"),
-        Image("butter"),
-        Image("coffee"),
-        Image("corn"),
-        Image("dairy-alternatives"),
-        Image("drinks"),
-        Image("oils"),
-        Image("sauces"),
-        Image("spices"),
-        Image("supplements"),
-        Image("sweet-potato"),
-        Image("sweets-and-snacks"),
-        Image("turkey")
-        
-    ]
+    let dateAdded: Date
+    
+    let icon: Image
+    
+    let showTime: Bool
+    let showAddIcon: Bool
     
     var body: some View {
         HStack{
-            iconImages.randomElement()!
-                .resizable()
-                .scaledToFit()
-                .frame(width: 40, height: 40)
-            
-            VStack(alignment: .leading){
-                Text(dummyFoodName)
-                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+            if showTime{
+                // FOOD LOG TIME
+                Text(DateFormattingUtil.formattedTime(from: dateAdded))
+                    .font(.system(size: 14, weight: .medium, design: .monospaced))
                     .foregroundStyle(Color("text1"))
                 
-                HStack{
-                    MacrosAmount(macroType: .calories, macroAmount: dummyCalories)
-                    MacrosAmount(macroType: .protein, macroAmount: dummyProtein)
-                    MacrosAmount(macroType: .fat, macroAmount: dummyFat)
-                    MacrosAmount(macroType: .carbs, macroAmount: dummyCarbs)
+                // SEPARATOR
+                Rectangle()
+                    .frame(width: 6, height: 1)
+                    .foregroundColor(Color("text1"))
+            }
+            
+            HStack{
+                icon
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 40, height: 40)
+                
+                VStack(alignment: .leading){
+                    Text(foodName)
+                        .font(.system(size: 14, weight: .bold, design: .monospaced))
+                        .foregroundStyle(Color("text1"))
                     
-                    // Divider
-                    Rectangle()
-                        .frame(width: 1, height: 14)
-                        .foregroundStyle(Color("text1").opacity(0.3))
-                        .padding(.horizontal, 4)
-                    
-                    ServingAmount()
+                    HStack{
+                        MacrosAmount(macroType: .calories, macroAmount: calories)
+                        MacrosAmount(macroType: .protein, macroAmount: protein)
+                        MacrosAmount(macroType: .fat, macroAmount: fats)
+                        MacrosAmount(macroType: .carbs, macroAmount: carbs)
+                        
+                        // Divider
+                        Rectangle()
+                            .frame(width: 1, height: 14)
+                            .foregroundStyle(Color("text1").opacity(0.3))
+                            .padding(.horizontal, 4)
+                        
+                        ServingAmount()
+                    }
                 }
             }
+            .frame(maxWidth: 310)
+            .padding(8)
+            .background(
+                Rectangle()
+                    .cornerRadius(6)
+                    .foregroundStyle(Color("background3"))
+            )
+            
+            if showAddIcon{
+                Spacer()
+                
+                Image(systemName: "plus")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 16, height: 16)
+                    .foregroundStyle(Color("secondary"))
+                    .padding(.trailing, 20)
+            }
         }
-        .padding(8)
-        .background(
-            Rectangle()
-                .cornerRadius(6)
-                .foregroundStyle(Color("background3"))
-        )
     }
 }
 
 private struct MacrosAmount: View {
     
-    let macroType: ProgressType
+    let macroType: MacroType
     let macroAmount: Double
     
     var body: some View {
@@ -112,8 +113,15 @@ private struct ServingAmount: View {
 }
 
 #Preview {
-    ZStack{
-        FoodItemCard()
+    @Previewable @State var previewVM: HomeViewModel = HomeViewModel(mockData: true, user: nil)
+    VStack{
+        let food = Food(name: "Olive Oil (10g)",calories: 111,  protein: 111,    fats: 111,  carbs: 111,   dateAdded: .now)
+        
+        FoodItemCard(foodName: food.name, calories: food.calories, protein: food.protein, fats: food.fats, carbs: food.carbs, dateAdded: food.dateAdded, icon: HomeViewModelUtil.iconImages.randomElement()!, showTime: false, showAddIcon: true)
+        
+        FoodItemCard(foodName: food.name, calories: food.calories, protein: food.protein, fats: food.fats, carbs: food.carbs, dateAdded: food.dateAdded, icon: HomeViewModelUtil.iconImages.randomElement()!, showTime: false, showAddIcon: true)
+        
+        FoodItemCard(foodName: food.name, calories: food.calories, protein: food.protein, fats: food.fats, carbs: food.carbs, dateAdded: food.dateAdded, icon: HomeViewModelUtil.iconImages.randomElement()!, showTime: false, showAddIcon: true)
     }
     .frame(maxWidth: .infinity)
     .frame(maxHeight: .infinity)

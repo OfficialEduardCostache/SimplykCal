@@ -116,7 +116,7 @@ struct FoodDetailsSheet: View {
 }
 
 private struct MacroLabel: View {
-    let type: ProgressType
+    let type: MacroType
     let amount: Double
     
     var body: some View {
