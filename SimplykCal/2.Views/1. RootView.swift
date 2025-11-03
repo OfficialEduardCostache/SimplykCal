@@ -16,11 +16,11 @@ struct RootView: View {
         if let user = users.first{
             ZStack {
                 switch tabBarViewModel.selectedTab {
-                case 0: HomeView(tabBarViewModel: tabBarViewModel, homeViewModel: HomeViewModel(user: user))
+                case 0: HomeView(tabBarViewModel: tabBarViewModel, user: user)
                 case 1: SimplyView()
                 case 2: StatisticsView()
                 case 3: SettingsView()
-                default: HomeView(tabBarViewModel: tabBarViewModel, homeViewModel: HomeViewModel(user: user))
+                default: HomeView(tabBarViewModel: tabBarViewModel, user: user)
                 }
             }
             .safeAreaInset(edge: .bottom) {

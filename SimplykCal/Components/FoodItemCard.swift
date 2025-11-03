@@ -104,22 +104,9 @@ struct MacroSection: View {
 
 
 #Preview {
-    @Previewable @State var previewVM: HomeViewModel = HomeViewModel(mockData: true, user: nil)
     VStack{
-        
-        ForEach(makeRandomFoods(count: 5, date: .now)) { food in
-            FoodItemCard(
-                foodName: food.name,
-                calories: food.calories,
-                protein: food.protein,
-                fats: food.fats,
-                carbs: food.carbs,
-                dateAdded: food.dateAdded,
-                isServing: food.isServing,
-                quantity: food.quantity,
-                icon: HomeViewModelUtil.iconImages[2],
-                showTime: true,
-                showAddIcon: false)
+        ForEach(Food.testFoods){ food in
+            FoodItemCard(foodName: food.name, calories: food.calories, protein: food.protein, fats: food.fats, carbs: food.carbs, dateAdded: food.dateAdded, isServing: food.isServing, quantity: food.quantity, icon: Food.iconImages[2], showTime: true, showAddIcon: false)
         }
     }
     .frame(maxWidth: .infinity)
@@ -127,40 +114,6 @@ struct MacroSection: View {
     .background(
         Color("background").ignoresSafeArea()
     )
-}
-
-func makeRandomFoods(count: Int = 5, date: Date = .now) -> [Food] {
-    (0..<count).map { i in
-        // random grams
-        let protein = Double.random(in: 0...999).rounded()
-        let fats    = Double.random(in: 0...999).rounded()
-        let carbs   = Double.random(in: 0...999).rounded()
-        
-        // kcal from macros (4/9/4 rule)
-        let calories = Double.random(in: 0...9999).rounded()
-        
-        let choice = Int.random(in: 1...2)
-        
-        var quantity: Double{
-            if choice == 1{
-                return Double.random(in: 1...9999).rounded()
-            }
-            else{
-                return Double.random(in: 1...99).rounded()
-            }
-        }
-        
-        return Food(
-            name: "Random Food \(i+1)",
-            calories: calories.rounded(),
-            protein: protein,
-            fats: fats,
-            carbs: carbs,
-            dateAdded: date,
-            isServing: choice == 1 ? false : true,
-            quantity: quantity
-        )
-    }
 }
 
 

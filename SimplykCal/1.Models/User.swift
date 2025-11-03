@@ -124,3 +124,22 @@ struct MacroSplit: Codable {
     let fat: Double
     let carbs: Double
 }
+
+extension User{
+    static var testUser = User(
+        name: "Eduard",
+        birthday: Calendar.current.date(from: .init(year: 2000, month: 6, day: 22))!,
+        height: 177,
+        weight: 70,
+        gender: .male,
+        activity: .moderate,
+        goal: .maintain,
+        bmr: 1650,
+        tdee: 2300,
+        macros: Macros(calories: 2200, protein: 140, fats: 60, carbs: 220),
+        macroSplit: MacroSplit(protein: 0.28, fat: 0.27, carbs: 0.45),
+        expectedEndDate: .now,
+        carbFatBalance: .balanced,
+        proteinIntake: .high
+    )
+}
