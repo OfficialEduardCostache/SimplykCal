@@ -18,12 +18,10 @@ class HomeViewModel{
     private var fatsConsumedToday: Double = 20
     private var carbsConsumedToday: Double = 20
     
-    private var foodConsumedToday: [Food] = []
     
     init(mockData: Bool = false, user: User?){
         if mockData{
             self.user = HomeViewModelUtil.testUser
-            self.foodConsumedToday = HomeViewModelUtil.mockFoodConsumedToday
         }
         else{
             self.user = user ?? HomeViewModelUtil.testUser
@@ -88,13 +86,6 @@ extension HomeViewModel{
     }
 }
 
-//MARK: Food functions
-extension HomeViewModel{
-    func getFoodConsumedToday() -> [Food]{
-        return self.foodConsumedToday
-    }
-}
-
 struct HomeViewModelUtil{
     static var testUser = User(
         name: "Test User",
@@ -112,27 +103,6 @@ struct HomeViewModelUtil{
         carbFatBalance: .balanced,
         proteinIntake: .high
     )
-    
-    static var mockFoodConsumedToday: [Food] = [
-        Food(name: "Banana",          calories: 105, protein: 1.3,  fats: 0.3, carbs: 27,  dateAdded: .now),
-        Food(name: "Greek Yogurt",    calories: 130, protein: 23,   fats: 0.4, carbs: 6,   dateAdded: .now),
-        Food(name: "Chicken Breast",  calories: 220, protein: 42,   fats: 4,   carbs: 0,   dateAdded: .now),
-        Food(name: "Rice (200g)",    calories: 260, protein: 5,    fats: 0.6, carbs: 57,  dateAdded: .now),
-        Food(name: "Olive Oil (10g)",calories: 90,  protein: 0,    fats: 10,  carbs: 0,   dateAdded: .now)
-    ]
-    
-    static var foodInDatabase: [Food] = [
-        Food(name: "Grilled Chicken Breast", calories: 165, protein: 31, fats: 3.6, carbs: 0, dateAdded: .now),
-        Food(name: "Brown Rice (1 cup)", calories: 216, protein: 5, fats: 1.8, carbs: 45, dateAdded: .now),
-        Food(name: "Avocado (1 medium)", calories: 240, protein: 3, fats: 22, carbs: 12, dateAdded: .now),
-        Food(name: "Salmon Fillet", calories: 206, protein: 22, fats: 12, carbs: 0, dateAdded: .now),
-        Food(name: "Banana", calories: 105, protein: 1.3, fats: 0.3, carbs: 27, dateAdded: .now),
-        Food(name: "Greek Yogurt (200g)", calories: 120, protein: 20, fats: 0.4, carbs: 7, dateAdded: .now),
-        Food(name: "Whole Egg", calories: 70, protein: 6, fats: 5, carbs: 0.5, dateAdded: .now),
-        Food(name: "Peanut Butter (2 tbsp)", calories: 190, protein: 8, fats: 16, carbs: 6, dateAdded: .now),
-        Food(name: "Apple", calories: 95, protein: 0.5, fats: 0.3, carbs: 25, dateAdded: .now),
-        Food(name: "Oatmeal (1 cup cooked)", calories: 155, protein: 6, fats: 3, carbs: 27, dateAdded: .now)
-    ]
     
     static var iconImages: [Image] =
     [

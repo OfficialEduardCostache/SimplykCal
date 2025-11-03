@@ -85,8 +85,18 @@ struct QuickAddScreen: View {
                 }
                 
                 // adding the food
-                let newFood = Food(name: newName, calories: newCalories, protein: newProtein, fats: newFat, carbs: newCarbs, dateAdded: Date.now)
+                let newFood = Food(
+                    name: newName,
+                    calories: newCalories,
+                    protein: newProtein,
+                    fats: newFat,
+                    carbs: newCarbs,
+                    dateAdded: Date.now,
+                    isServing: true,
+                    quantity: 1)
                 context.insert(newFood)
+                
+                try? context.save()
                 
                 // closing the screen
                 showAddFoodSheet = false

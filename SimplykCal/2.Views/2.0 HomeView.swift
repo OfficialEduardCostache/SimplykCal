@@ -116,7 +116,18 @@ private struct FoodHistoryStack: View {
                 ScrollView(.vertical) {
                     LazyVStack(spacing: 8) {
                         ForEach(foods, id: \.persistentModelID) { food in
-                            FoodItemCard(foodName: food.name, calories: food.calories, protein: food.protein, fats: food.fats, carbs: food.carbs, dateAdded: food.dateAdded, icon: HomeViewModelUtil.iconImages.randomElement()!, showTime: true, showAddIcon: false)
+                            FoodItemCard(
+                                foodName: food.name,
+                                calories: food.calories,
+                                protein: food.protein,
+                                fats: food.fats,
+                                carbs: food.carbs,
+                                dateAdded: food.dateAdded,
+                                isServing: food.isServing,
+                                quantity: food.quantity,
+                                icon: HomeViewModelUtil.iconImages[2],
+                                showTime: true,
+                                showAddIcon: false)
                         }
                     }
                     .padding(.vertical, 8)
@@ -156,7 +167,18 @@ struct ExpandedFoodHistorySheet: View{
             ScrollView(.vertical) {
                 LazyVStack(spacing: 8) {
                     ForEach(foods, id: \.persistentModelID) { food in
-                        FoodItemCard(foodName: food.name, calories: food.calories, protein: food.protein, fats: food.fats, carbs: food.carbs, dateAdded: food.dateAdded, icon: HomeViewModelUtil.iconImages.randomElement()!, showTime: true, showAddIcon: false)
+                        FoodItemCard(
+                            foodName: food.name,
+                            calories: food.calories,
+                            protein: food.protein,
+                            fats: food.fats,
+                            carbs: food.carbs,
+                            dateAdded: food.dateAdded,
+                            isServing: food.isServing,
+                            quantity: food.quantity,
+                            icon: HomeViewModelUtil.iconImages[2],
+                            showTime: true,
+                            showAddIcon: false)
                     }
                 }
                 .padding(.vertical, 8)

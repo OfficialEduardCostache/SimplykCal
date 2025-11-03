@@ -34,13 +34,7 @@ struct RecipesScreen: View {
             .padding(.bottom)
             
             ScrollView{
-                let foods = HomeViewModelUtil.foodInDatabase
-                ForEach(foods, id: \.self) { food in
-                    FoodItemCard(foodName: food.name, calories: food.calories, protein: food.protein, fats: food.fats, carbs: food.carbs, dateAdded: food.dateAdded, icon: HomeViewModelUtil.iconImages.randomElement()!, showTime: false, showAddIcon: true)
-                        .onTapGesture {
-                            showFoodDetailsSheet = true
-                        }
-                }
+                
             }
             .scrollIndicators(.hidden)
         }
