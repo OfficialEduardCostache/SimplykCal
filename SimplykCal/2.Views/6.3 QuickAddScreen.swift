@@ -17,6 +17,9 @@ struct QuickAddScreen: View {
     @State private var carbs: String = ""
     @State private var name: String = ""
     
+    @State private var date: Date = Date.now
+    @State private var presentDatePickerSheet: Bool = false
+    
     @State private var isError: Bool = false
     @State private var errorMessage: String = ""
     
@@ -44,6 +47,19 @@ struct QuickAddScreen: View {
             
             SKTextField(title: "Name", text: $name)
                 .padding()
+            
+            VStack{
+                SKLabel(text: "Time & Date")
+                
+                Button {
+                    presentDatePickerSheet = true
+                } label: {
+                    SKDateContainer(dateString: DateFormattingUtil.formatDateAndTime(date: date))
+                }
+                .tint(Color("primary"))
+
+            }
+            .padding()
             
             Spacer()
             
@@ -111,7 +127,12 @@ struct QuickAddScreen: View {
         } message: {
             Text(errorMessage)
         }
-
+        .sheet(isPresented: $presentDatePickerSheet) {
+            presentDatePickerSheet = false
+        } content: {
+            SKDatePickerSheet(date: $date, mode: .simple)
+                .presentationDetents([.fraction(0.25)])
+        }
     }
 }
 

@@ -35,24 +35,21 @@ struct DetailsScreen: View {
                 ScrollView{
                     //MARK: Birthday
                     VStack{
-                        Text("Birthday")
-                            .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                            .foregroundStyle(Color("text1"))
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        SKLabel(text: "Birthday")
                         
-                        BirthdayContainer(birthdayAsString: viewModel.formatDate(date: viewModel.birthday))
-                            .onTapGesture {
-                                showBirthdayPicker = true
-                            }
+                        Button {
+                            showBirthdayPicker = true
+                        } label: {
+                            SKDateContainer(dateString: DateFormattingUtil.formatDate(date: viewModel.birthday))
+                        }
+                        .tint(Color("primary"))
+                        
                     }
                     .padding(.horizontal)
                     
                     //MARK: Height
                     VStack{
-                        Text("Height")
-                            .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                            .foregroundStyle(Color("text1"))
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        SKLabel(text: "Height")
                         
                         SKSlider(value: $viewModel.height, range: viewModel.heightRange, step: 0.5, unitOfMeasure: "cm")
                             .background(
@@ -65,10 +62,7 @@ struct DetailsScreen: View {
 
                     //MARK: Weight
                     VStack{
-                        Text("Weight")
-                            .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                            .foregroundStyle(Color("text1"))
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        SKLabel(text: "Weight")
                         
                         SKSlider(value: $viewModel.weight, range: viewModel.weightRange, step: 0.5, unitOfMeasure: "kg")
                             .background(
@@ -81,10 +75,7 @@ struct DetailsScreen: View {
 
                     // gender
                     VStack{
-                        Text("Gender")
-                            .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                            .foregroundStyle(Color("text1"))
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        SKLabel(text: "Gender")
                         
                         HStack{
                             SKButton(title: "Male", isSelected: viewModel.gender == .male) {
@@ -121,134 +112,8 @@ struct DetailsScreen: View {
         .sheet(isPresented: $showBirthdayPicker, onDismiss: {
             showBirthdayPicker = false
         }) {
-            BirthdayPickerSheet(date: $viewModel.birthday)
+            SKDatePickerSheet(date: $viewModel.birthday, mode: .complex)
                 .presentationDetents([.fraction(0.25)])
-        }
-    }
-}
-
-private struct BirthdayContainer: View {
-    var birthdayAsString: String
-    
-    var body: some View {
-        HStack{
-            Text(birthdayAsString)
-                .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                .foregroundStyle(Color("text1"))
-                .padding(.vertical)
-                .padding(.leading)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            
-            Image(systemName: "chevron.down")
-                .padding(.trailing)
-                .font(.system(size: 14, weight: .semibold, design: .monospaced))
-        }
-        .frame(maxWidth: .infinity)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color("background2"))
-        )
-        .overlay {
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(Color("background3"), lineWidth: 4)
-        }
-    }
-}
-
-private struct BirthdayPickerSheet: View {
-    @Binding var date: Date
-
-    // Local wheels
-    @State private var day: Int
-    @State private var month: Int    // 1...12
-    @State private var year: Int
-
-    private let calendar = Calendar.current
-    private let monthNames = Calendar.current.monthSymbols
-
-    // Bounds: now-16 down to (now-16)-100
-    private var currentYear: Int { calendar.component(.year, from: .now) }
-    private var upperYear: Int { currentYear - 16 }
-    private var lowerYear: Int { upperYear - 100 }
-
-    // Init from the binding
-    init(date: Binding<Date>) {
-        _date = date
-        let comps = Calendar.current.dateComponents([.day, .month, .year], from: date.wrappedValue)
-        _day   = State(initialValue: comps.day ?? 1)
-        _month = State(initialValue: comps.month ?? 1)
-        _year  = State(initialValue: min(max(comps.year ?? 2000, (Calendar.current.component(.year, from: .now) - 16) - 100),
-                                         Calendar.current.component(.year, from: .now) - 16))
-    }
-    
-    var body: some View {
-        ZStack{
-            Color("background").ignoresSafeArea()
-            
-            HStack {
-                // Day
-                Picker("Day", selection: $day) {
-                    ForEach(validDaysInMonth, id: \.self) { d in
-                        Text("\(d)").tag(d)
-                    }
-                }
-                .pickerStyle(.wheel)
-                .frame(maxWidth: .infinity)
-                
-                // Month (names)
-                Picker("Month", selection: $month) {
-                    ForEach(1...12, id: \.self) { m in
-                        Text(monthNames[m - 1]).tag(m)
-                    }
-                }
-                .pickerStyle(.wheel)
-                .frame(maxWidth: .infinity)
-                
-                // Year (bounded)
-                Picker("Year", selection: $year) {
-                    ForEach(lowerYear...upperYear, id: \.self) { y in
-                        Text(String(y)).tag(y)
-                    }
-                }
-                .pickerStyle(.wheel)
-                .frame(maxWidth: .infinity)
-            }
-            .onAppear {
-                // Make sure the initial wheels respect bounds & valid days
-                clampYearIntoBounds()
-                clampDayIfNeeded()
-                syncToBinding()
-            }
-            .onChange(of: month) { _, _ in clampDayIfNeeded(); syncToBinding() }
-            .onChange(of: year)  { _, _ in clampYearIntoBounds(); clampDayIfNeeded(); syncToBinding() }
-            .onChange(of: day)   { _, _ in syncToBinding() }
-        }
-        
-    }
-    
-    private var validDaysInMonth: [Int] {
-        let comps = DateComponents(year: year, month: month)
-        guard let date = calendar.date(from: comps),
-              let range = calendar.range(of: .day, in: .month, for: date)
-        else { return Array(1...28) }
-        return Array(range)
-    }
-
-    private func clampDayIfNeeded() {
-        let maxDay = validDaysInMonth.last ?? 28
-        if day > maxDay { day = maxDay }
-        if day < 1 { day = 1 }
-    }
-
-    private func clampYearIntoBounds() {
-        if year > upperYear { year = upperYear }
-        if year < lowerYear { year = lowerYear }
-    }
-
-    private func syncToBinding() {
-        let comps = DateComponents(year: year, month: month, day: day)
-        if let newDate = calendar.date(from: comps) {
-            date = newDate
         }
     }
 }

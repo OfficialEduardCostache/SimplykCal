@@ -42,6 +42,18 @@ struct DateFormattingUtil{
         formatter.locale = Locale.current // respects user 12/24h preference
         return formatter.string(from: date)
     }
+    
+    static func formatDate(date: Date) -> String{
+        date.formatted(.dateTime.day().month(.wide).year())
+    }
+    
+    static func formatShort(date: Date) -> String{
+        date.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated))
+    }
+    
+    static func formatDateAndTime(date: Date) -> String{
+        date.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated).hour().minute())
+    }
 }
 
 struct DateUtility {

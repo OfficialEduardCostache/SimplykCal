@@ -136,10 +136,6 @@ class OnboardingViewModel{
         return newUser
     }
     
-    func formatDate(date: Date) -> String{
-        date.formatted(.dateTime.day().month(.wide).year())
-    }
-    
     func getYearsFromBirthday() -> Double {
         let calendar = Calendar.current
         let ageComponents = calendar.dateComponents([.year], from: birthday, to: Date())

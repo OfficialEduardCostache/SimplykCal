@@ -33,7 +33,7 @@ struct ExtendedGoalScreen: View {
                     
                     //MARK: Date container
                     VStack(alignment: .leading){
-                        Text(viewModel.formatDate(date: viewModel.expectedEndDate))
+                        Text(DateFormattingUtil.formatDate(date: viewModel.expectedEndDate))
                             .font(.system(size: 14, weight: .bold, design: .monospaced))
                             .foregroundStyle(Color("text1"))
                         

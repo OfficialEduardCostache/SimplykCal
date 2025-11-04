@@ -41,9 +41,7 @@ struct SKTextField: View {
         VStack(alignment: .leading, spacing: 8) {
             // LABEL
             if let title {
-                Text(title)
-                    .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(Color("text2"))
+                SKLabel(text: title)
             }
 
             // FIELD CONTAINER

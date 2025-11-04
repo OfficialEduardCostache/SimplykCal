@@ -174,7 +174,7 @@ struct GoalSummaryScreen: View {
 
 
                             }) {
-                                Text(viewModel.formatDate(date: viewModel.expectedEndDate))
+                                Text(DateFormattingUtil.formatDate(date: viewModel.expectedEndDate))
                                     .font(.system(size: 16, weight: .bold, design: .monospaced))
                                     .foregroundStyle(Color("text1"))
                             }
